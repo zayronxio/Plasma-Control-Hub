@@ -10,9 +10,14 @@ import Qt5Compat.GraphicalEffects
 import org.kde.plasma.private.mediacontroller 1.0
 import org.kde.plasma.private.mpris as Mpris
 import org.kde.plasma.private.volume 0.1 as Vol
+import "js/funcs.js" as Funcs
+import org.kde.bluezqt 1.0 as BluezQt
 
 PlasmoidItem {
     id: root
+
+     // BLUETOOTH
+    property QtObject btManager : BluezQt.Manager
 
     // Audio source
     property var sink: paSinkModel.preferredSink
@@ -79,12 +84,71 @@ PlasmoidItem {
                     width: parent.width/2
                     height: parent.height
                     KSvg.FrameSvgItem {
+                        id: backgrounNetBlueSettings
                     imagePath: "translucent/dialogs/background"
                     clip: true
                     anchors.right: parent.right
                     anchors.left: parent.left
                     width: parent.width - 5
                     height: parent.height - 5
+                         Column {
+                                width: parent.width
+                                height: parent.height
+
+                                Item {
+                                    id: network
+                                    width: parent.width
+                                    height: parent.height/3
+                                }
+                                Item {
+                                    id: bluetooth
+                                    width: parent.width
+                                    height: parent.height/3
+                                    Row {
+                                        width: parent.width*.3
+                                        height: parent.height
+                                        Rectangle {
+                                            id: bubbleButtonBlue
+                                            color: Kirigami.Theme.highlightColor
+                                            anchors.horizontalCenter: parent.horizontalCenter
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            width: parent.height*.7
+                                            height: width
+                                            radius: height/2
+                                            Kirigami.Icon {
+                                                id: bluetoothIcon
+                                                width: parent.width*.8
+                                                height: width
+                                                anchors.horizontalCenter: parent.horizontalCenter
+                                                anchors.verticalCenter: parent.verticalCenter
+                                                source: "bluetooth"
+                                            }
+                                            MouseArea {
+                                                anchors.fill: parent
+                                                onClicked: {
+                                                     Funcs.toggleBluetooth()
+                                                }
+                                            }
+                                        }
+
+                                    }
+                                    Item {
+                                            width: parent.width*.7
+                                            height: parent.height
+                                            anchors.right: parent.right
+                                            PlasmaComponents3.Label {
+                                                anchors.verticalCenter: parent.verticalCenter
+                                                width: parent.width*.9
+                                                text: i18n("bluetooth")
+                                            }
+                                        }
+                                }
+                                Item {
+                                    id: settings
+                                    width: parent.width
+                                    height: parent.height/3
+                                }
+                         }
                 }
 
                 }
@@ -102,6 +166,7 @@ PlasmoidItem {
                             anchors.left: parent.left
                             width: parent.width
                             height: parent.height - 5
+
                        }
 
                     }

@@ -16,5 +16,6 @@ It's still a work in progress, it may not work
 ## Features
 
 - Multimedia Controls
--  Volume control
+- Volume control
+- toogle control bluetooth
 - The rest of the functions are not yet available
