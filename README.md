@@ -18,4 +18,6 @@ It's still a work in progress, it may not work
 - Multimedia Controls
 - Volume control
 - toogle control bluetooth
+- button setting
+- button audio settings
 - The rest of the functions are not yet available

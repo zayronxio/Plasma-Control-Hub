@@ -274,6 +274,7 @@ PlasmoidItem {
                         height: windowsvolumen.height
                         anchors.right: windowsvolumen.right
                         Item {
+                            id: buttonsettingPulseAudio
                             width: columnSettingsVolume.width
                             height: columnSettingsVolume.height/2
                             anchors.bottom: columnSettingsVolume.bottom
@@ -283,6 +284,19 @@ PlasmoidItem {
                                 height: width
                                 color: "#26000000"
                                 radius: height/2
+                                Kirigami.Icon {
+                                    width: parent.width*.7
+                                    height: width
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    source: "configure"
+                                }
+                                MouseArea {
+                                    anchors.fill: parent
+                                    onClicked: {
+                                        KCMLauncher.openSystemSettings("kcm_pulseaudio")
+                                    }
+                                }
                             }
                         }
                     }
