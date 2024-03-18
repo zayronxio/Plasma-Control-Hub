@@ -12,6 +12,7 @@ import org.kde.plasma.private.mpris as Mpris
 import org.kde.plasma.private.volume 0.1 as Vol
 import "js/funcs.js" as Funcs
 import org.kde.bluezqt 1.0 as BluezQt
+import org.kde.kcmutils // KCMLauncher
 
 PlasmoidItem {
     id: root
@@ -147,6 +148,44 @@ PlasmoidItem {
                                     id: settings
                                     width: parent.width
                                     height: parent.height/3
+                                    Row {
+                                        width: parent.width*.3
+                                        height: parent.height
+                                        Rectangle {
+                                            id: bubbleButtonSettings
+                                            color: Kirigami.Theme.highlightColor
+                                            anchors.horizontalCenter: parent.horizontalCenter
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            width: parent.height*.7
+                                            height: width
+                                            radius: height/2
+                                            Kirigami.Icon {
+                                                id: settingsIcon
+                                                width: parent.width*.8
+                                                height: width
+                                                anchors.horizontalCenter: parent.horizontalCenter
+                                                anchors.verticalCenter: parent.verticalCenter
+                                                source: "configure"
+                                            }
+                                            MouseArea {
+                                                anchors.fill: parent
+                                                onClicked: {
+                                                     KCMLauncher.openSystemSettings("")
+                                                }
+                                            }
+                                        }
+
+                                    }
+                                    Item {
+                                            width: parent.width*.7
+                                            height: parent.height
+                                            anchors.right: parent.right
+                                            PlasmaComponents3.Label {
+                                                anchors.verticalCenter: parent.verticalCenter
+                                                width: parent.width*.9
+                                                text: i18n("Settings")
+                                            }
+                                        }
                                 }
                          }
                 }
