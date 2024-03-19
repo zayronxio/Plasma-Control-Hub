@@ -11,14 +11,21 @@ import org.kde.plasma.private.mediacontroller 1.0
 import org.kde.plasma.private.mpris as Mpris
 import org.kde.plasma.private.volume 0.1 as Vol
 import "js/funcs.js" as Funcs
+import "lib" as Lib
 import org.kde.bluezqt 1.0 as BluezQt
 import org.kde.kcmutils // KCMLauncher
+import org.kde.plasma.networkmanagement as PlasmaNM
+import "components" as Components
+import org.kde.kquickcontrolsaddons 2.0
 
 PlasmoidItem {
     id: root
 
      // BLUETOOTH
     property QtObject btManager : BluezQt.Manager
+
+    property var network: network
+
 
     // Audio source
     property var sink: paSinkModel.preferredSink
@@ -27,6 +34,8 @@ PlasmoidItem {
         id: paSinkModel
     }
     readonly property bool isVertical: Plasmoid.formFactor === PlasmaCore.Types.Vertical
+
+
 
     compactRepresentation: MouseArea {
         id: compactRoot
@@ -67,11 +76,19 @@ PlasmoidItem {
     }
      fullRepresentation: Item {
          id: menu
-          implicitHeight: 200
-        implicitWidth: 100
+          implicitHeight: 400
+        implicitWidth: 220
+
+        // Lists all available network connections
+    Components.SectionNetworks{
+        id: sectionNetworks
+    }
+    Components.Network {
+        id: network
+    }
 
         Column {
-            id: columnone
+            id: wrapper
             anchors.verticalCenter: parent.verticalCenter
             width: menu.width
             height: menu.height
@@ -97,9 +114,54 @@ PlasmoidItem {
                                 height: parent.height
 
                                 Item {
-                                    id: network
+                                    id: networkItem
                                     width: parent.width
                                     height: parent.height/3
+                                    Row {
+                                        width: parent.width*.3
+                                        height: parent.height
+                                        Rectangle {
+                                            id: bubbleButtonNet
+                                            color: Kirigami.Theme.highlightColor
+                                            anchors.horizontalCenter: parent.horizontalCenter
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            width: parent.height*.7
+                                            height: width
+                                            radius: height/2
+                                            Kirigami.Icon {
+                                                id: networkIcon
+                                                width: parent.width*.8
+                                                height: width
+                                                anchors.horizontalCenter: parent.horizontalCenter
+                                                anchors.verticalCenter: parent.verticalCenter
+                                                source: network.activeConnectionIcon
+                                                visible: false
+                                            }
+                                            ColorOverlay {
+                                                anchors.fill: networkIcon
+                                                source: networkIcon
+                                                color: "#ffffff"
+                                            }
+
+                                            MouseArea {
+                                                anchors.fill: parent
+                                                onClicked: {
+                                                     sectionNetworks.toggleNetworkSection()
+                                                }
+                                            }
+                                        }
+
+                                    }
+                                    Item {
+                                            width: parent.width*.7
+                                            height: parent.height
+                                            anchors.right: parent.right
+                                            PlasmaComponents3.Label {
+                                                anchors.verticalCenter: parent.verticalCenter
+                                                width: parent.width*.9
+                                                text: i18n("Network")
+                                            }
+                                        }
                                 }
                                 Item {
                                     id: bluetooth
@@ -123,7 +185,14 @@ PlasmoidItem {
                                                 anchors.horizontalCenter: parent.horizontalCenter
                                                 anchors.verticalCenter: parent.verticalCenter
                                                 source: "bluetooth"
+                                                visible: false
                                             }
+                                            ColorOverlay {
+                                                anchors.fill: bluetoothIcon
+                                                source: bluetoothIcon
+                                                color: "#ffffff"
+                                            }
+
                                             MouseArea {
                                                 anchors.fill: parent
                                                 onClicked: {
@@ -166,6 +235,12 @@ PlasmoidItem {
                                                 anchors.horizontalCenter: parent.horizontalCenter
                                                 anchors.verticalCenter: parent.verticalCenter
                                                 source: "configure"
+                                                visible: false
+                                            }
+                                            ColorOverlay {
+                                                anchors.fill: settingsIcon
+                                                source: settingsIcon
+                                                color: "#ffffff"
                                             }
                                             MouseArea {
                                                 anchors.fill: parent

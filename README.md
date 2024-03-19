@@ -20,4 +20,5 @@ It's still a work in progress, it may not work.</center>
 - toogle control bluetooth
 - button setting
 - button audio settings
+- Network configs
 - The rest of the functions are not yet available
