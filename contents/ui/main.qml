@@ -17,15 +17,18 @@ import org.kde.kcmutils // KCMLauncher
 import org.kde.plasma.networkmanagement as PlasmaNM
 import "components" as Components
 import org.kde.kquickcontrolsaddons 2.0
+import org.kde.plasma.private.brightnesscontrolplugin
 
 PlasmoidItem {
     id: root
 
-     // BLUETOOTH
+    // BLUETOOTH
     property QtObject btManager : BluezQt.Manager
 
     property var network: network
 
+    property var monitor: monitor
+    property var inhibitor: inhibitor
 
     // Audio source
     property var sink: paSinkModel.preferredSink
@@ -34,8 +37,6 @@ PlasmoidItem {
         id: paSinkModel
     }
     readonly property bool isVertical: Plasmoid.formFactor === PlasmaCore.Types.Vertical
-
-
 
     compactRepresentation: MouseArea {
         id: compactRoot
@@ -55,8 +56,6 @@ PlasmoidItem {
         onPressed: wasExpanded = root.expanded
         onClicked: root.expanded = !wasExpanded
 
-
-
         Row {
             id: compactRow
             layoutDirection: iconPositionRight ? Qt.RightToLeft : Qt.LeftToRight
@@ -74,18 +73,19 @@ PlasmoidItem {
             }
         }
     }
-     fullRepresentation: Item {
-         id: menu
-          implicitHeight: 400
-        implicitWidth: 220
+
+    fullRepresentation: Item {
+        id: menu
+        implicitHeight: 410
+        implicitWidth: 300
 
         // Lists all available network connections
-    Components.SectionNetworks{
-        id: sectionNetworks
-    }
-    Components.Network {
-        id: network
-    }
+        Components.SectionNetworks{
+            id: sectionNetworks
+        }
+        Components.Network {
+            id: network
+        }
 
         Column {
             id: wrapper
@@ -103,140 +103,138 @@ PlasmoidItem {
                     height: parent.height
                     KSvg.FrameSvgItem {
                         id: backgrounNetBlueSettings
-                    imagePath: "translucent/dialogs/background"
-                    clip: true
-                    anchors.right: parent.right
-                    anchors.left: parent.left
-                    width: parent.width - 5
-                    height: parent.height - 5
-                         Column {
+                        imagePath: "translucent/dialogs/background"
+                        clip: true
+                        anchors.right: parent.right
+                        anchors.left: parent.left
+                        width: parent.width - 5
+                        height: parent.height - 5
+                        Column {
+                            width: parent.width
+                            height: parent.height
+
+                            Item {
+                                id: networkItem
                                 width: parent.width
-                                height: parent.height
-
-                                Item {
-                                    id: networkItem
-                                    width: parent.width
-                                    height: parent.height/3
-                                    Row {
-                                        width: parent.width*.3
-                                        height: parent.height
-                                        Rectangle {
-                                            id: bubbleButtonNet
-                                            color: Kirigami.Theme.highlightColor
+                                height: parent.height/3
+                                Row {
+                                    width: parent.width*.3
+                                    height: parent.height
+                                    Rectangle {
+                                        id: bubbleButtonNet
+                                        color: Kirigami.Theme.highlightColor
+                                        anchors.horizontalCenter: parent.horizontalCenter
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        width: parent.height*.7
+                                        height: width
+                                        radius: height/2
+                                        Kirigami.Icon {
+                                            id: networkIcon
+                                            width: parent.width*.8
+                                            height: width
                                             anchors.horizontalCenter: parent.horizontalCenter
                                             anchors.verticalCenter: parent.verticalCenter
-                                            width: parent.height*.7
-                                            height: width
-                                            radius: height/2
-                                            Kirigami.Icon {
-                                                id: networkIcon
-                                                width: parent.width*.8
-                                                height: width
-                                                anchors.horizontalCenter: parent.horizontalCenter
-                                                anchors.verticalCenter: parent.verticalCenter
-                                                source: network.activeConnectionIcon
-                                                visible: false
-                                            }
-                                            ColorOverlay {
-                                                anchors.fill: networkIcon
-                                                source: networkIcon
-                                                color: "#ffffff"
-                                            }
-
-                                            MouseArea {
-                                                anchors.fill: parent
-                                                onClicked: {
-                                                     sectionNetworks.toggleNetworkSection()
-                                                }
-                                            }
+                                            source: network.activeConnectionIcon
+                                            visible: false
+                                        }
+                                        ColorOverlay {
+                                            anchors.fill: networkIcon
+                                            source: networkIcon
+                                            color: "#ffffff"
                                         }
 
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            onClicked: {
+                                                sectionNetworks.toggleNetworkSection()
+                                            }
+                                        }
                                     }
-                                    Item {
-                                            width: parent.width*.7
-                                            height: parent.height
-                                            anchors.right: parent.right
-                                            PlasmaComponents3.Label {
-                                                anchors.verticalCenter: parent.verticalCenter
-                                                width: parent.width*.9
-                                                text: i18n("Network")
-                                            }
-                                        }
                                 }
                                 Item {
-                                    id: bluetooth
-                                    width: parent.width
-                                    height: parent.height/3
-                                    Row {
-                                        width: parent.width*.3
-                                        height: parent.height
-                                        Rectangle {
-                                            id: bubbleButtonBlue
-                                            color: Kirigami.Theme.highlightColor
+                                    width: parent.width*.7
+                                    height: parent.height
+                                    anchors.right: parent.right
+                                    PlasmaComponents3.Label {
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        width: parent.width*.9
+                                        text: i18n("Network")
+                                    }
+                                }
+                            }
+                            Item {
+                                id: bluetooth
+                                width: parent.width
+                                height: parent.height/3
+                                Row {
+                                    width: parent.width*.3
+                                    height: parent.height
+                                    Rectangle {
+                                        id: bubbleButtonBlue
+                                        color: Kirigami.Theme.highlightColor
+                                        anchors.horizontalCenter: parent.horizontalCenter
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        width: parent.height*.7
+                                        height: width
+                                        radius: height/2
+                                        Kirigami.Icon {
+                                            id: bluetoothIcon
+                                            width: parent.width*.8
+                                            height: width
                                             anchors.horizontalCenter: parent.horizontalCenter
                                             anchors.verticalCenter: parent.verticalCenter
-                                            width: parent.height*.7
-                                            height: width
-                                            radius: height/2
-                                            Kirigami.Icon {
-                                                id: bluetoothIcon
-                                                width: parent.width*.8
-                                                height: width
-                                                anchors.horizontalCenter: parent.horizontalCenter
-                                                anchors.verticalCenter: parent.verticalCenter
-                                                source: "bluetooth"
-                                                visible: false
-                                            }
-                                            ColorOverlay {
-                                                anchors.fill: bluetoothIcon
-                                                source: bluetoothIcon
-                                                color: "#ffffff"
-                                            }
-
-                                            MouseArea {
-                                                anchors.fill: parent
-                                                onClicked: {
-                                                     Funcs.toggleBluetooth()
-                                                }
-                                            }
+                                            source: "bluetooth"
+                                            visible: false
+                                        }
+                                        ColorOverlay {
+                                            anchors.fill: bluetoothIcon
+                                            source: bluetoothIcon
+                                            color: "#ffffff"
                                         }
 
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            onClicked: {
+                                                Funcs.toggleBluetooth()
+                                            }
+                                        }
                                     }
-                                    Item {
-                                            width: parent.width*.7
-                                            height: parent.height
-                                            anchors.right: parent.right
-                                            PlasmaComponents3.Label {
-                                                anchors.verticalCenter: parent.verticalCenter
-                                                width: parent.width*.9
-                                                text: i18n("bluetooth")
-                                            }
-                                        }
                                 }
                                 Item {
-                                    id: settings
-                                    width: parent.width
-                                    height: parent.height/3
-                                    Row {
-                                        width: parent.width*.3
-                                        height: parent.height
-                                        Rectangle {
-                                            id: bubbleButtonSettings
-                                            color: Kirigami.Theme.highlightColor
+                                    width: parent.width*.7
+                                    height: parent.height
+                                    anchors.right: parent.right
+                                    PlasmaComponents3.Label {
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        width: parent.width*.9
+                                        text: i18n("bluetooth")
+                                    }
+                                }
+                            }
+                            Item {
+                                id: settings
+                                width: parent.width
+                                height: parent.height/3
+                                Row {
+                                    width: parent.width*.3
+                                    height: parent.height
+                                    Rectangle {
+                                        id: bubbleButtonSettings
+                                        color: Kirigami.Theme.highlightColor
+                                        anchors.horizontalCenter: parent.horizontalCenter
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        width: parent.height*.7
+                                        height: width
+                                        radius: height/2
+                                        Kirigami.Icon {
+                                            id: settingsIcon
+                                            width: parent.width*.8
+                                            height: width
                                             anchors.horizontalCenter: parent.horizontalCenter
                                             anchors.verticalCenter: parent.verticalCenter
-                                            width: parent.height*.7
-                                            height: width
-                                            radius: height/2
-                                            Kirigami.Icon {
-                                                id: settingsIcon
-                                                width: parent.width*.8
-                                                height: width
-                                                anchors.horizontalCenter: parent.horizontalCenter
-                                                anchors.verticalCenter: parent.verticalCenter
-                                                source: "configure"
-                                                visible: false
-                                            }
+                                            source: "configure"
+                                            visible: false
+                                        }
                                             ColorOverlay {
                                                 anchors.fill: settingsIcon
                                                 source: settingsIcon
@@ -298,6 +296,97 @@ PlasmoidItem {
                                 anchors.left: parent.left
                                 width: parent.width
                                 height: parent.height
+
+                                Column {
+                                    width: parent.width
+                                    height: parent.height
+                                    Item {
+                                        width: parent.width
+                                        height: parent.height*.6
+                                        Kirigami.Icon {
+                                            width: parent.height
+                                            height: width
+                                            visible: true
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            anchors.horizontalCenter: parent.horizontalCenter
+                                            source: {
+                                                if (!monitor.enabled) {
+                                                    return "redshift-status-off"; // not configured: show generic night light icon rather "manually turned off"icon
+                                                    } else if (!monitor.running) {
+                                                        return "redshift-status-on";
+
+                                                    } else if (monitor.daylight && monitor.targetTemperature != 6500) { // show daylight icon only when temperature during the day is actually modified
+                                                        return "redshift-status-day";
+
+                                                    } else {
+                                                        return "redshift-status-on";
+
+                                                    }
+
+                                            }
+                                            MouseArea {
+                                                anchors.fill: parent
+                                                onClicked: toggleInhibition()
+                                                function toggleInhibition() {
+                                                    if (!monitor.available) {
+                                                        return;
+
+
+                                                    }
+        switch (inhibitor.state) {
+        case NightColorInhibitor.Inhibiting:
+        case NightColorInhibitor.Inhibited:
+            inhibitor.uninhibit();
+            break;
+        case NightColorInhibitor.Uninhibiting:
+        case NightColorInhibitor.Uninhibited:
+            inhibitor.inhibit();
+            break;
+        }
+    }
+
+    NightColorInhibitor {
+        id: inhibitor
+    }
+
+    NightColorMonitor {
+        id: monitor
+
+        readonly property bool transitioning: monitor.currentTemperature != monitor.targetTemperature
+        readonly property bool hasSwitchingTimes: monitor.mode != 3
+    }
+        }
+    }
+                                    }
+                                    Item {
+                                        id: labelredfish
+                                        width: parent.width
+                                        height: parent.height*.4
+                                         Label {
+                                             width: parent.width
+                                             text: {
+                                                if (!monitor.enabled) {
+                                                    return i18n("Off"); // not configured: show generic night light icon rather "manually turned off"icon
+                                                    } else if (!monitor.running) {
+                                                        return  i18n("On");
+
+                                                    } else if (monitor.daylight && monitor.targetTemperature != 6500) { // show daylight icon only when temperature during the day is actually modified
+                                                        return  i18n("Off");
+
+                                                    } else {
+                                                        return  i18n("On");
+
+                                                    }
+
+                                            }
+                                            font.pixelSize: labelredfish.height*.6
+                                            horizontalAlignment: Text.AlignHCenter
+    }
+                                    }
+
+
+
+                                }
                             }
                         }
                         Item {
