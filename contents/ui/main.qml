@@ -16,8 +16,10 @@ import org.kde.bluezqt 1.0 as BluezQt
 import org.kde.kcmutils // KCMLauncher
 import org.kde.plasma.networkmanagement as PlasmaNM
 import "components" as Components
-import org.kde.kquickcontrolsaddons 2.0
+
 import org.kde.plasma.private.brightnesscontrolplugin
+import org.kde.notificationmanager as NotificationManager
+import org.kde.plasma.plasma5support as Plasma5Support
 
 PlasmoidItem {
     id: root
@@ -30,6 +32,12 @@ PlasmoidItem {
     property var monitor: monitor
     property var inhibitor: inhibitor
 
+    // NOTIFICATION MANAGER
+    property var notificationSettings: notificationSettings
+
+    NotificationManager.Settings {
+        id: notificationSettings
+    }
     // Audio source
     property var sink: paSinkModel.preferredSink
     readonly property bool sinkAvailable: sink && !(sink && sink.name == "auto_null")
@@ -37,6 +45,8 @@ PlasmoidItem {
         id: paSinkModel
     }
     readonly property bool isVertical: Plasmoid.formFactor === PlasmaCore.Types.Vertical
+
+    property string iconNotifications: "notifications"
 
     compactRepresentation: MouseArea {
         id: compactRoot
@@ -76,7 +86,7 @@ PlasmoidItem {
 
     fullRepresentation: Item {
         id: menu
-        implicitHeight: 410
+        implicitHeight: brillo.visible ? 410 : 350
         implicitWidth: 300
 
         // Lists all available network connections
@@ -94,15 +104,16 @@ PlasmoidItem {
             height: menu.height
 
             Row {
-                id: utilities
+                id: utilities // Primera mitad el widget
                 width: parent.width
-                height: parent.height*.4
+                height: brillo.visible ? parent.height*.4 : parent.height*.5
                 spacing: 5
                 Column {
                     width: parent.width/2
                     height: parent.height
+
                     KSvg.FrameSvgItem {
-                        id: backgrounNetBlueSettings
+                        id: backgrounNetBlueSettings // seccion de botones de red, bluetooth y config
                         imagePath: "translucent/dialogs/background"
                         clip: true
                         anchors.right: parent.right
@@ -116,7 +127,7 @@ PlasmoidItem {
                             Item {
                                 id: networkItem
                                 width: parent.width
-                                height: parent.height/3
+                                height:  parent.height/3
                                 Row {
                                     width: parent.width*.3
                                     height: parent.height
@@ -132,17 +143,11 @@ PlasmoidItem {
                                             id: networkIcon
                                             width: parent.width*.8
                                             height: width
+                                            color: "white"
                                             anchors.horizontalCenter: parent.horizontalCenter
                                             anchors.verticalCenter: parent.verticalCenter
                                             source: network.activeConnectionIcon
-                                            visible: false
                                         }
-                                        ColorOverlay {
-                                            anchors.fill: networkIcon
-                                            source: networkIcon
-                                            color: "#ffffff"
-                                        }
-
                                         MouseArea {
                                             anchors.fill: parent
                                             onClicked: {
@@ -156,10 +161,14 @@ PlasmoidItem {
                                     height: parent.height
                                     anchors.right: parent.right
                                     PlasmaComponents3.Label {
+                                        id: nameNetwork
                                         anchors.verticalCenter: parent.verticalCenter
                                         width: parent.width*.9
                                         text: i18n("Network")
+                                        font.pixelSize: networkItem.height*.22
+                                        font.bold: true
                                     }
+
                                 }
                             }
                             Item {
@@ -183,15 +192,8 @@ PlasmoidItem {
                                             height: width
                                             anchors.horizontalCenter: parent.horizontalCenter
                                             anchors.verticalCenter: parent.verticalCenter
-                                            source: "bluetooth"
-                                            visible: false
+                                            source: Funcs.getBtDevice() === "Disabled" ? Funcs.getBtDevice() === "Unavailable" ? "bluetooth-disabled-symbolic" : "bluetooth-active-symbolic" : "bluetooth-active-symbolic"
                                         }
-                                        ColorOverlay {
-                                            anchors.fill: bluetoothIcon
-                                            source: bluetoothIcon
-                                            color: "#ffffff"
-                                        }
-
                                         MouseArea {
                                             anchors.fill: parent
                                             onClicked: {
@@ -204,10 +206,23 @@ PlasmoidItem {
                                     width: parent.width*.7
                                     height: parent.height
                                     anchors.right: parent.right
-                                    PlasmaComponents3.Label {
+                                    Column {
+                                        width: parent.width
+                                        height: nameBluetooth.height+subNameBluetooth.height
                                         anchors.verticalCenter: parent.verticalCenter
-                                        width: parent.width*.9
-                                        text: i18n("bluetooth")
+                                        PlasmaComponents3.Label {
+                                            id: nameBluetooth
+                                            width: parent.width*.9
+                                            text: i18n("bluetooth")
+                                            font.pixelSize: bluetooth.height*.22
+                                            font.bold: true
+                                        }
+                                        PlasmaComponents3.Label {
+                                            id: subNameBluetooth
+                                            width: parent.width*.9
+                                            font.pixelSize: nameBluetooth.font.pixelSize*.8
+                                            text: Funcs.getBtDevice()
+                                        }
                                     }
                                 }
                             }
@@ -226,20 +241,16 @@ PlasmoidItem {
                                         width: parent.height*.7
                                         height: width
                                         radius: height/2
+
                                         Kirigami.Icon {
                                             id: settingsIcon
                                             width: parent.width*.8
                                             height: width
+                                            color: "white"
                                             anchors.horizontalCenter: parent.horizontalCenter
                                             anchors.verticalCenter: parent.verticalCenter
                                             source: "configure"
-                                            visible: false
                                         }
-                                            ColorOverlay {
-                                                anchors.fill: settingsIcon
-                                                source: settingsIcon
-                                                color: "#ffffff"
-                                            }
                                             MouseArea {
                                                 anchors.fill: parent
                                                 onClicked: {
@@ -253,10 +264,24 @@ PlasmoidItem {
                                             width: parent.width*.7
                                             height: parent.height
                                             anchors.right: parent.right
-                                            PlasmaComponents3.Label {
+                                            Column {
+                                                width: parent.width
+                                                height: nameSettigns.height+subNameSettigns.height
                                                 anchors.verticalCenter: parent.verticalCenter
-                                                width: parent.width*.9
-                                                text: i18n("Settings")
+
+                                                PlasmaComponents3.Label {
+                                                    id: nameSettigns
+                                                    width: parent.width*.9
+                                                    text: i18n("Settings")
+                                                    font.pixelSize: setting.height*.22
+                                                    font.bold: true
+                                                }
+                                                PlasmaComponents3.Label {
+                                                    id: subNameSettigns
+                                                    width: parent.width*.9
+                                                    text: i18n("System Settings")
+                                                    font.pixelSize: nameSettigns.font.pixelSize*.8
+                                                }
                                             }
                                         }
                                 }
@@ -265,19 +290,71 @@ PlasmoidItem {
 
                 }
                 Column {
-                    width: parent.width/2
+                    width:  parent.width/2
                     height: parent.height
 
                     Column {
                         width: parent.width -5
                         height: parent.height/2
                         KSvg.FrameSvgItem {
+
                             imagePath: "translucent/dialogs/background"
                             clip: true
                             anchors.right: parent.right
                             anchors.left: parent.left
                             width: parent.width
                             height: parent.height - 5
+                            Row {
+                                width: parent.width
+                                height: parent.height
+
+                                Item {
+                                    width: parent.width*.35
+                                    height: parent.height
+                                    Rectangle {
+                                        width: parent.width < parent.height ? parent.width*.85 : parent.height*.85
+                                        height: width
+                                        color: "#26000000"
+                                        radius: width/2
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        anchors.horizontalCenter: parent.horizontalCenter
+                                        Kirigami.Icon {
+                                            width: parent.width*.8
+                                            height: width
+                                            color: Kirigima.Theme.TextColor
+                                            source: Funcs.checkInhibition() ? "notifications-disabled" : "notifications"
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            anchors.horizontalCenter: parent.horizontalCenter
+                                            MouseArea {
+                                                anchors.fill: parent
+                                                hoverEnabled: true
+                                                onClicked: Funcs.toggleDnd();
+                                            }
+                                        }
+                                    }
+                                }
+                                Item {
+                                    id: boxDontDisturb
+                                    width: parent.width*.65
+                                    height: parent.height
+                                    Column {
+                                        width: parent.width
+                                        height: textdontDis.height+subTextdontDis.height
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        Label {
+                                            id: textdontDis
+                                            text: i18n("Don't Disturb")
+                                            font.pixelSize: boxDontDisturb.width*.11
+                                            font.bold: true
+                                        }
+                                        Label {
+                                            id: subTextdontDis
+                                            text: Funcs.checkInhibition() ? i18n("Off") : i18n("On")
+                                            font.pixelSize: boxDontDisturb.width*.09
+                                        }
+                                    }
+                                }
+                            }
 
                        }
 
@@ -287,7 +364,7 @@ PlasmoidItem {
                         height: (parent.height/2) - 5
                         spacing: 5
                         Item {
-                            width: (parent.width/2) - 2.5
+                            width: doggledarktheme.visible ? (parent.width/2) - 2.5 : parent.width
                             height: parent.height
                             KSvg.FrameSvgItem {
                                 imagePath: "translucent/dialogs/background"
@@ -322,47 +399,42 @@ PlasmoidItem {
                                                         return "redshift-status-on";
 
                                                     }
-
-                                            }
-                                            MouseArea {
-                                                anchors.fill: parent
-                                                onClicked: toggleInhibition()
-                                                function toggleInhibition() {
-                                                    if (!monitor.available) {
-                                                        return;
-
-
+                                                }
+                                                MouseArea {
+                                                    anchors.fill: parent
+                                                    onClicked: toggleInhibition()
+                                                    function toggleInhibition() {
+                                                        if (!monitor.available) {
+                                                            return;
+                                                        }
+                                                        switch (inhibitor.state) {
+                                                            case NightColorInhibitor.Inhibiting:
+                                                            case NightColorInhibitor.Inhibited:
+                                                                inhibitor.uninhibit();
+                                                                break;
+                                                            case NightColorInhibitor.Uninhibiting:
+                                                            case NightColorInhibitor.Uninhibited:
+                                                                inhibitor.inhibit();
+                                                                break;
+                                                        }
                                                     }
-        switch (inhibitor.state) {
-        case NightColorInhibitor.Inhibiting:
-        case NightColorInhibitor.Inhibited:
-            inhibitor.uninhibit();
-            break;
-        case NightColorInhibitor.Uninhibiting:
-        case NightColorInhibitor.Uninhibited:
-            inhibitor.inhibit();
-            break;
-        }
-    }
-
-    NightColorInhibitor {
-        id: inhibitor
-    }
-
-    NightColorMonitor {
-        id: monitor
-
-        readonly property bool transitioning: monitor.currentTemperature != monitor.targetTemperature
-        readonly property bool hasSwitchingTimes: monitor.mode != 3
-    }
-        }
-    }
+                                                    NightColorInhibitor {
+                                                        id: inhibitor
+                                                    }
+                                                    NightColorMonitor {
+                                                        id: monitor
+                                                        readonly property bool transitioning: monitor.currentTemperature != monitor.targetTemperature
+                                                        readonly property bool hasSwitchingTimes: monitor.mode != 3
+                                                    }
+                                                }
+                                        }
                                     }
                                     Item {
                                         id: labelredfish
                                         width: parent.width
                                         height: parent.height*.4
                                          Label {
+                                             id: textOfNightLight
                                              width: parent.width
                                              text: {
                                                 if (!monitor.enabled) {
@@ -379,7 +451,7 @@ PlasmoidItem {
                                                     }
 
                                             }
-                                            font.pixelSize: labelredfish.height*.6
+                                            font.pixelSize: labelredfish.height*.4
                                             horizontalAlignment: Text.AlignHCenter
     }
                                     }
@@ -390,8 +462,10 @@ PlasmoidItem {
                             }
                         }
                         Item {
+                            id: doggledarktheme
                             width: (parent.width/2) -2.5
                             height: parent.height
+                            visible: false // en espera de actualizacion
                             KSvg.FrameSvgItem {
                                 imagePath: "translucent/dialogs/background"
                                 clip: true
@@ -403,12 +477,14 @@ PlasmoidItem {
                         }
                     }
                 }
-            }
+            } // fin Primera mitad el widget
+//****************************************************//
 
             Item {
                 id: brillo
                 width: parent.width
                 height: parent.height*.2
+                visible: false // en espera de actualizacion
                 KSvg.FrameSvgItem {
                     imagePath: "translucent/dialogs/background"
                     clip: true
@@ -422,7 +498,7 @@ PlasmoidItem {
             Item {
                 id: volumen
                 width: parent.width
-                height: parent.height*.2
+                height: brillo.visible ? parent.height*.2 : parent.height*.25
                  KSvg.FrameSvgItem {
                      id: windowsvolumen
 
@@ -501,15 +577,15 @@ PlasmoidItem {
 
                     Rectangle {
                         id: bar
-                        width: backOfSlider.width-6
-                        height: backOfSlider.height-6
-                        anchors.centerIn: backOfSlider
-                        color: kirigami.Theme.TextColor
+                        width: slider.value < 75 ? backOfSlider.width/28 + slider.visualPosition * parent.width :  slider.value < 50 ? backOfSlider.width/15 + slider.visualPosition * parent.width : slider.value < 35 ? backOfSlider.width/5 + slider.visualPosition * parent.width : slider.value < 20 ?  backOfSlider.width/2 - slider.visualPosition * parent.width/4 : slider.value < 10 ?  backOfSlider.width*1.5 + slider.visualPosition * parent.width : slider.value < 5 ?  backOfSlider.width/1 + slider.visualPosition * parent.width : slider.visualPosition * parent.width
+                        height: backOfSlider.height
+                        color: slider.value < 5 ? "transparent" : "white"
+                        border.color: slider.value < 5 ? "transparent" : "#bdbebf"
                         radius: height/2
 
                         Kirigami.Icon {
                             id: maskvolumenicon
-                            width: parent.height*.8
+                            width: parent.height*.9
                             source: "volume-level-high-panel"
                             anchors.verticalCenter: parent.verticalCenter
 
@@ -529,15 +605,16 @@ PlasmoidItem {
 
 
                     }
+
                 }
 
                 handle: Rectangle {
                    x: slider.leftPadding + slider.visualPosition * (slider.availableWidth - width)
-                   y: slider.topPadding + slider.availableHeight / 2 - bar.height*.77
+                   y: slider.topPadding + slider.availableHeight / 2 - bar.height*.73
                    implicitWidth: bar.height
                    implicitHeight: bar.height
                    radius: implicitHeight/2
-                   color: kirigami.Theme.TextColor
+                   color: "white"
                    border.color: "#bdbebf"
     }
 
@@ -550,7 +627,7 @@ PlasmoidItem {
             Item {
                 id: mutimedia
                 width: parent.width
-                height: parent.height*.2
+                height: brillo.visible ? parent.height*.2 : parent.height*.25
 
                 KSvg.FrameSvgItem {
                     id: rect
