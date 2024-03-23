@@ -710,8 +710,12 @@ PlasmoidItem {
                                  id: iconplay
                                  width: 22
                                  height: width
-                                 source: "player-play"
+                                 source: (mpris2Model.currentPlayer?.playbackStatus ?? 0) === Mpris.PlaybackStatus.Playing ? "media-playback-pause" : "media-playback-start"
                                  roundToIconSize: false
+                                 MouseArea {
+                                     anchors.fill: parent
+                                     onClicked: mpris2Model.currentPlayer.PlayPause();
+                                }
                              }
                              Kirigami.Icon {
                                  id: nextplay
@@ -721,7 +725,7 @@ PlasmoidItem {
                                  roundToIconSize: false
                                  MouseArea {
                                      anchors.fill: parent
-                                     onClicked: next()
+                                     onClicked:  mpris2Model.currentPlayer.Next();
                                 }
                              }
 

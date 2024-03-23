@@ -21,4 +21,6 @@ It's still a work in progress, it may not work.</center>
 - button setting
 - button audio settings
 - Network configs
+- dont Disturb toggle
+- night light toggle
 - The rest of the functions are not yet available
