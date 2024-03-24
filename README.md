@@ -26,4 +26,7 @@ It's still a work in progress, it may not work.</center>
 - The rest of the functions are not yet available
 
 ## Preview
-<img src="https://raw.githubusercontent.com/zayronxio/Plasma-Control-Hub/main/img/preview.jpg" width=250/>
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/zayronxio/Plasma-Control-Hub/main/img/preview.jpg" width=380/>
+  </p>
