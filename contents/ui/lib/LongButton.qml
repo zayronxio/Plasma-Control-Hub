@@ -4,7 +4,7 @@ import QtQuick.Layouts
 import Qt5Compat.GraphicalEffects
 
 import org.kde.plasma.core as PlasmaCore
-import org.kde.plasma.components as PlasmaComponents
+import org.kde.plasma.components 3.0 as PlasmaComponents3
 import org.kde.ksvg as KSvg
 import org.kde.kirigami as Kirigami
 
@@ -41,14 +41,14 @@ KSvg.FrameSvgItem {
             Layout.preferredWidth: Layout.preferredHeight
         }
 
-        PlasmaComponents.Label {
+        PlasmaComponents3.Label {
             id: title
             Layout.fillWidth: true
             font.pixelSize: root.largeFontSize
             font.weight: Font.Bold
             elide: Text.ElideRight
         }
-        PlasmaComponents.Label {
+        PlasmaComponents3.Label {
             id: subtitle
             Layout.fillWidth: true
             font.pixelSize: root.mediumFontSize

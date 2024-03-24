@@ -1,5 +1,5 @@
-import QtQuick
-import QtQuick.Controls
+import QtQuick 2.15
+import QtQuick.Controls 2.15
 import QtQuick.Layouts
 import org.kde.plasma.plasmoid
 import org.kde.plasma.core  as PlasmaCore
@@ -7,7 +7,6 @@ import org.kde.plasma.components 3.0 as PlasmaComponents3
 import org.kde.kirigami as Kirigami
 import org.kde.ksvg as KSvg
 import Qt5Compat.GraphicalEffects
-import org.kde.plasma.private.mediacontroller 1.0
 import org.kde.plasma.private.mpris as Mpris
 import org.kde.plasma.private.volume 0.1 as Vol
 import "js/funcs.js" as Funcs
@@ -87,7 +86,7 @@ PlasmoidItem {
     fullRepresentation: Item {
         id: menu
         implicitHeight: brillo.visible ? 410 : 350
-        implicitWidth: 300
+        implicitWidth: 320
 
         // Lists all available network connections
         Components.SectionNetworks{
@@ -213,7 +212,7 @@ PlasmoidItem {
                                         PlasmaComponents3.Label {
                                             id: nameBluetooth
                                             width: parent.width*.9
-                                            text: i18n("bluetooth")
+                                            text: i18n("Bluetooth")
                                             font.pixelSize: bluetooth.height*.22
                                             font.bold: true
                                         }
@@ -555,70 +554,66 @@ PlasmoidItem {
                         }
 
                         Slider {
-                        id: slider
-                        width: (parent.width*.81)-6
-                        height: parent.height/2
-                        anchors.bottom: parent.bottom
+                            id: slider
+                            width: (parent.width*.81)-6
+                            height: parent.height/2
+                            anchors.bottom: parent.bottom
                             from: 1
-    value: (sink.volume / Vol.PulseAudio.NormalVolume * 100)
-    to: 100
-    snapMode: Slider.SnapAlways
-    onMoved: {
-        sink.volume = value * Vol.PulseAudio.NormalVolume / 100
-
-    }
-                background: Rectangle {
-                    id: backOfSlider
-                    width: parent.width
-                    height: parent.height*.7
-
-                    color: "#26000000"
-                    radius: height/2
-
-                    Rectangle {
-                        id: bar
-                        width: slider.value < 75 ? backOfSlider.width/28 + slider.visualPosition * parent.width :  slider.value < 50 ? backOfSlider.width/15 + slider.visualPosition * parent.width : slider.value < 35 ? backOfSlider.width/5 + slider.visualPosition * parent.width : slider.value < 20 ?  backOfSlider.width/2 - slider.visualPosition * parent.width/4 : slider.value < 10 ?  backOfSlider.width*1.5 + slider.visualPosition * parent.width : slider.value < 5 ?  backOfSlider.width/1 + slider.visualPosition * parent.width : slider.visualPosition * parent.width
-                        height: backOfSlider.height
-                        color: slider.value < 5 ? "transparent" : "white"
-                        border.color: slider.value < 5 ? "transparent" : "#bdbebf"
-                        radius: height/2
-
-                        Kirigami.Icon {
-                            id: maskvolumenicon
-                            width: parent.height*.9
-                            source: "volume-level-high-panel"
-                            anchors.verticalCenter: parent.verticalCenter
-
-                        }
-                        Rectangle {
-                            width: parent.height*.8
-                            height: width
-                            color: Kirigami.Theme.highlightColor
-                            layer.enabled: true
-                                  layer.effect: OpacityMask {
-                                  maskSource: maskvolumenicon
+                            value: (sink.volume / Vol.PulseAudio.NormalVolume * 100)
+                            to: 100
+                            snapMode: Slider.SnapAlways
+                            onMoved: {
+                                sink.volume = value * Vol.PulseAudio.NormalVolume / 100
                             }
-                            anchors.verticalCenter: parent.verticalCenter
-                            opacity: .4
+                            background: Rectangle {
+                                id: backOfSlider
+                                width: parent.width
+                                height: parent.height*.7
+                                color: "#26000000"
+                                radius: height/2
+                                Rectangle {
+                                    id: bar
+                                    width: (slider.visualPosition * parent.width) + handleSlider.width*(1-slider.visualPosition)
+                                    height: backOfSlider.height
+                                    color: slider.value < 5 ? "transparent" : "white"
+                                    border.color: slider.value < 5 ? "transparent" : "#bdbebf"
+                                    radius: height/2
+                                    Kirigami.Icon {
+                                        id: maskvolumenicon
+                                        width: parent.height*.9
+                                        source: "volume-level-high-panel"
+                                        anchors.verticalCenter: parent.verticalCenter
+
+                                    }
+                                    Rectangle {
+                                        width: parent.height*.8
+                                        height: width
+                                        color: Kirigami.Theme.highlightColor
+                                        layer.enabled: true
+                                        layer.effect: OpacityMask {
+                                            maskSource: maskvolumenicon
+
+                                        }
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        opacity: .4
+
+                                    }
+
+                                }
+
+                            }
+                            handle: Rectangle {
+                                id: handleSlider
+                                x: ((backOfSlider.width-width)*slider.visualPosition)
+                                y: slider.topPadding + slider.availableHeight / 2 - bar.height*.73
+                                implicitWidth: bar.height
+                                implicitHeight: bar.height
+                                radius: implicitHeight/2
+                                color: "white"
+                                border.color: "#bdbebf"
+
+                            }
                         }
-
-
-
-                    }
-
-                }
-
-                handle: Rectangle {
-                   x: slider.leftPadding + slider.visualPosition * (slider.availableWidth - width)
-                   y: slider.topPadding + slider.availableHeight / 2 - bar.height*.73
-                   implicitWidth: bar.height
-                   implicitHeight: bar.height
-                   radius: implicitHeight/2
-                   color: "white"
-                   border.color: "#bdbebf"
-    }
-
-}
                     }
 
                  }
@@ -657,10 +652,27 @@ PlasmoidItem {
                             visible: false
                         }
                         Image {
+                            id: nocover
+                            width: maskalbum.width
+                            height: maskalbum.height
+                            source: "img/nocover.svg"
+                            sourceSize: Qt.size(width, width)
+                            fillMode: Image.PreserveAspectFit
+                            anchors.verticalCenter: parent.verticalCenter
+                            visible: !mpris2Model.currentPlayer?.artUrl
+                            Kirigami.Icon {
+                                source: "multimedia-audio-player"
+                                width: parent.width *.6
+                                height: width
+                                anchors.centerIn: parent
+                            }
+                        }
+                        Image {
                             anchors.verticalCenter: parent.verticalCenter
                             width: maskalbum.width
                             height: maskalbum.height
                             source: mpris2Model.currentPlayer?.artUrl
+                            visible: !mpris2Model.currentPlayer?.artUrl ? false : true
                             layer.enabled: true
                                   layer.effect: OpacityMask {
                                   maskSource: maskalbum
@@ -683,14 +695,18 @@ PlasmoidItem {
                             height: parent.height
                             PlasmaComponents3.Label {
                                 id: title2
+                                width: (contenedorInfoMusic.width - controlsMultimedia.width)
                                 text: mpris2Model.currentPlayer?.track
                                 font.pixelSize: mutimedia.height*.15
                                 font.bold: true
+                                wrapMode: Text.WordWrap
                             }
                             PlasmaComponents3.Label {
+                                width: (contenedorInfoMusic.width - controlsMultimedia.width)
                                 id: artist2
                                 text: mpris2Model.currentPlayer?.artist ?? ""
                                 font.pixelSize: mutimedia.height*.14
+                                elide: Text.ElideRight
                                 opacity: .80
                             }
                         }
@@ -703,8 +719,9 @@ PlasmoidItem {
                             spacing: 2
                             anchors.verticalCenter: parent.verticalCenter
                             function next() {
-        mpris2Model.currentPlayer.Next();
-    }
+                                mpris2Model.currentPlayer.Next();
+
+                            }
 
                              Kirigami.Icon {
                                  id: iconplay
