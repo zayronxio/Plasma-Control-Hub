@@ -688,7 +688,7 @@ PlasmoidItem {
                             id: contenedorInfoMusic
                             anchors.verticalCenter: parent.verticalCenter
                             width: parent.width - maskalbum.width - margin.width*3 - controlsMultimedia.width
-                            height: title2.height + artist2.height
+                            height: artist2.text.length > 1 ? title2.height + artist2.height : title2.height
                             color: "transparent"
                             Column {
                             width: parent.width
@@ -700,6 +700,8 @@ PlasmoidItem {
                                 font.pixelSize: mutimedia.height*.15
                                 font.bold: true
                                 wrapMode: Text.WordWrap
+                                elide: Text.ElideRight
+                                maximumLineCount: 2
                             }
                             PlasmaComponents3.Label {
                                 width: (contenedorInfoMusic.width - controlsMultimedia.width)
@@ -707,6 +709,7 @@ PlasmoidItem {
                                 text: mpris2Model.currentPlayer?.artist ?? ""
                                 font.pixelSize: mutimedia.height*.14
                                 elide: Text.ElideRight
+                                visible: artist2.text.length > 1 ? true : false
                                 opacity: .80
                             }
                         }
