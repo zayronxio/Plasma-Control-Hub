@@ -30,3 +30,17 @@ It's still a work in progress, it may not work.</center>
 <p align="center">
   <img src="https://raw.githubusercontent.com/zayronxio/Plasma-Control-Hub/main/img/preview.jpg" width=380/>
   </p>
+
+## Dependencies
+- KDE Plasma 6.0 and above
+- Packages: `plasma-nm`, `kdeplasma-addons`, `plasma-pa`
+- KDE Connect
+
+## Installation
+#### KDE Store (Preferred way)
+1. Right click on the desktop
+2. Click on "Add Widgets"
+3. Click on "Get New Widgets"
+4. Click on "Download New Plasma Widgets"
+5. Search for "Plasma Control Hub"
+6. Click on "Install" and you're done!
