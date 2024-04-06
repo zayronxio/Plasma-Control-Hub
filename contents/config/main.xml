@@ -6,13 +6,14 @@
   <kcfgfile name=""/>
 
   <group name="General">
-	<entry name="fontSize" type="Int">
-		<default>33</default>
-		<label>font Size</label>
+	<entry name="useCoordinatesIp" type="bool">
+            <default>true</default>
+        </entry>
+    <entry name="latitudeC" type="string">
+		<default>0</default>
 	</entry>
-    <entry name="textinC" type="string">
-		<default>it is</default>
-		<label>text</label>
+    <entry name="longitudeC" type="string">
+		<default>0</default>
 	</entry>
   </group>
 

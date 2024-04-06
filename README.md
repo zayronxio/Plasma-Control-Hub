@@ -30,3 +30,7 @@ It's still a work in progress, it may not work.</center>
 <p align="center">
   <img src="https://raw.githubusercontent.com/zayronxio/Plasma-Control-Hub/main/img/preview.jpg" width=380/>
   </p>
+
+## Install
+
+<p align="center">To install use plasma store discover and search for Plasma-Control-Hub, and press the install button.</center>

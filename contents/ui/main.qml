@@ -18,7 +18,7 @@ import "components" as Components
 
 import org.kde.plasma.private.brightnesscontrolplugin
 import org.kde.notificationmanager as NotificationManager
-import org.kde.plasma.plasma5support as Plasma5Support
+
 
 PlasmoidItem {
     id: root
@@ -37,6 +37,10 @@ PlasmoidItem {
     NotificationManager.Settings {
         id: notificationSettings
     }
+
+    WeatherData {
+		id: weatherData
+	}
     // Audio source
     property var sink: paSinkModel.preferredSink
     readonly property bool sinkAvailable: sink && !(sink && sink.name == "auto_null")
@@ -113,7 +117,7 @@ PlasmoidItem {
 
                     KSvg.FrameSvgItem {
                         id: backgrounNetBlueSettings // seccion de botones de red, bluetooth y config
-                        imagePath: "translucent/dialogs/background"
+                        imagePath: "opaque/dialogs/background"
                         clip: true
                         anchors.right: parent.right
                         anchors.left: parent.left
@@ -287,17 +291,21 @@ PlasmoidItem {
                          }
                 }
 
-                }
+            }
                 Column {
                     width:  parent.width/2
                     height: parent.height
-
+                    Item {
+                        width: parent.width -5
+                        height: parent.height
+                        visible: false
+                    }
                     Column {
                         width: parent.width -5
                         height: parent.height/2
                         KSvg.FrameSvgItem {
 
-                            imagePath: "translucent/dialogs/background"
+                            imagePath: "opaque/dialogs/background"
                             clip: true
                             anchors.right: parent.right
                             anchors.left: parent.left
@@ -363,10 +371,10 @@ PlasmoidItem {
                         height: (parent.height/2) - 5
                         spacing: 5
                         Item {
-                            width: doggledarktheme.visible ? (parent.width/2) - 2.5 : parent.width
+                            width: weatherToggle.visible ? (parent.width/2) - 2.5 : parent.width
                             height: parent.height
                             KSvg.FrameSvgItem {
-                                imagePath: "translucent/dialogs/background"
+                                imagePath: "opaque/dialogs/background"
                                 clip: true
                                 anchors.right: parent.right
                                 anchors.left: parent.left
@@ -461,17 +469,109 @@ PlasmoidItem {
                             }
                         }
                         Item {
-                            id: doggledarktheme
+                            id: weatherToggle
                             width: (parent.width/2) -2.5
                             height: parent.height
-                            visible: false // en espera de actualizacion
+                            visible: visible // en espera de actualizacion
                             KSvg.FrameSvgItem {
-                                imagePath: "translucent/dialogs/background"
+                                imagePath: "opaque/dialogs/background"
                                 clip: true
                                 anchors.right: parent.right
                                 anchors.left: parent.left
                                 width: parent.width
                                 height: parent.height
+                                Column {
+                                    width: parent.width
+                                    height: parent.height
+                                    Rectangle {
+                                        width: logoweather.width + textTemWeather.width
+                                        height: parent.height/2.5
+                                        color: "transparent"
+                                        anchors.horizontalCenter: parent.horizontalCenter
+                                        Row {
+                                            id: backgroundOfIconWeather
+                                            width: parent.width
+                                            height: parent.height
+                                            Kirigami.Icon {
+                                                id: logoweather
+                                                source: weatherData.iconWeatherCurrent
+                                                width: height*.8
+                                                color: Kirigima.Theme.TextColor
+                                                anchors.verticalCenter: parent.verticalCenter // Centrar verticalmente
+
+
+                                            }
+                                            Rectangle {
+                                                width: logoweather.width*.1
+                                                height: parent.height
+                                                color: "transparent"
+                                            }
+                                            Row {
+                                                id: textTemWeather
+                                                width: tem.width + numenclatura.width
+                                                height: tem.implicitHeight-5
+                                                anchors.verticalCenter: parent.verticalCenter
+                                                PlasmaComponents3.Label {
+                                                    id: tem
+                                                    text: Number(weatherData.temperaturaActual)
+                                                    font.pixelSize:  backgroundOfIconWeather.height*.5
+                                                }
+                                                PlasmaComponents3.Label {
+                                                    id: numenclatura
+                                                    text: "°C"
+                                                    font.pixelSize: backgroundOfIconWeather.height*.3
+                                                    anchors.top: tem.top
+                                                }
+                                            }
+
+                                        }
+
+                                    }
+                                    Column {
+                                        id: weatherandmaxmin
+                                        width: parent.width
+                                        height: weatherToggle.height*.6
+                                        spacing: 2
+
+                                        PlasmaComponents3.Label {
+                                            id: weatherCurrent
+                                            text: weatherData.weathertext
+                                            font.pixelSize: weatherData.weathertext.length < 11 ? parent.height*.35 : parent.height*.25
+                                            width: parent.width
+                                            wrapMode: Text.WordWrap
+                                            elide: Text.ElideRight
+                                            maximumLineCount: 2
+                                            horizontalAlignment: Text.AlignHCenter // Centra horizontalmente
+                                        }
+
+
+                                            Row {
+                                            height: parent.height-weatherCurrent.height
+                                            anchors.horizontalCenter: parent.horizontalCenter
+                                            spacing: parent.height/6
+                                            PlasmaComponents3.Label {
+                                                id: gradosdeTemMin
+                                                text: weatherData.minweatherCurrent
+                                                font.pixelSize: weatherData.weathertext.length < 11 ? parent.height*.45 : parent.height*.3
+                                                verticalAlignment: Text.AlignVCenter // Alineación vertical centrada
+                                            }
+                                            PlasmaComponents3.Label {
+                                                id: separatorgradosdeTem
+                                                text: "|"
+                                                font.pixelSize: weatherData.weathertext.length < 11 ? parent.height*.45 : parent.height*.3
+                                                verticalAlignment: Text.AlignVCenter // Alineación vertical centrada
+                                            }
+                                            PlasmaComponents3.Label {
+                                                id: gradosdeTemMax
+                                                text: weatherData.maxweatherCurrent
+                                                font.pixelSize: weatherData.weathertext.length < 11 ? parent.height*.45 : parent.height*.3
+                                                verticalAlignment: Text.AlignVCenter // Alineación vertical centrada
+                                            }
+                                        }
+
+                                    }
+
+                                }
                             }
                         }
                     }
@@ -485,7 +585,7 @@ PlasmoidItem {
                 height: parent.height*.2
                 visible: false // en espera de actualizacion
                 KSvg.FrameSvgItem {
-                    imagePath: "translucent/dialogs/background"
+                    imagePath: "opaque/dialogs/background"
                     clip: true
                     anchors.right: parent.right
                     anchors.left: parent.left
@@ -501,7 +601,7 @@ PlasmoidItem {
                  KSvg.FrameSvgItem {
                      id: windowsvolumen
 
-                    imagePath: "translucent/dialogs/background"
+                    imagePath: "opaque/dialogs/background"
                     clip: true
                     anchors.right: parent.right
                     anchors.left: parent.left
@@ -627,7 +727,7 @@ PlasmoidItem {
                 KSvg.FrameSvgItem {
                     id: rect
 
-                    imagePath: "translucent/dialogs/background"
+                    imagePath: "opaque/dialogs/background"
                     clip: true
                     anchors.right: parent.right
                     anchors.left: parent.left
@@ -763,6 +863,23 @@ PlasmoidItem {
 
     Mpris.Mpris2Model {
         id: mpris2Model
+    }
+    Timer {
+        id: weatherupdate
+        interval: 900000
+        running: true
+        repeat: true
+        onTriggered: {
+            weatherData.executeCommand()
+        }
+    }
+     Timer {
+        interval: 100 // Tiempo en milisegundos (en este caso, se ejecutará después de 1 segundo)
+        repeat: false // No se repite
+        running: true // Comienza a correr automáticamente cuando la aplicación inicia
+        onTriggered: {
+           weatherData.executeCommand()
+        }
     }
 }
 
