@@ -23,6 +23,7 @@ It's still a work in progress, it may not work.</center>
 - Network configs
 - dont Disturb toggle
 - night light toggle
+- weather current
 - The rest of the functions are not yet available
 
 ## Preview
@@ -34,3 +35,17 @@ It's still a work in progress, it may not work.</center>
 ## Install
 
 <p align="center">To install use plasma store discover and search for Plasma-Control-Hub, and press the install button.</center>
+=======
+## Dependencies
+- KDE Plasma 6.0 and above
+- Packages: `plasma-nm`, `kdeplasma-addons`, `plasma-pa`
+- KDE Connect
+
+## Installation
+#### KDE Store (Preferred way)
+1. Right click on the desktop
+2. Click on "Add Widgets"
+3. Click on "Get New Widgets"
+4. Click on "Download New Plasma Widgets"
+5. Search for "Plasma Control Hub"
+6. Click on "Install" and you're done!
