@@ -37,7 +37,8 @@
 ## Install
 
 <p align="center">To install use plasma store discover and search for Plasma-Control-Hub, and press the install button.</p>
-=======
+
+
 ## Dependencies
 - KDE Plasma 6.0 and above
 - Packages: `plasma-nm`, `kdeplasma-addons`, `plasma-pa`
