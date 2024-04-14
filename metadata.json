@@ -15,7 +15,7 @@
         "ServiceTypes": [
             "Plasma/Applet"
         ],
-        "Version": "0.1.6.8",
+        "Version": "0.1.7",
         "Website": "https://github.com/zayronxio/Plasma-Control-Hub"
     },
     "X-Plasma-API-Minimum-Version": "6.0",

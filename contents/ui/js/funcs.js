@@ -144,4 +144,3 @@ function sumarDia(a) {
         console.log("Fecha con un día añadido:", fechaFormateada);
         return fechaFormateada
     }
-

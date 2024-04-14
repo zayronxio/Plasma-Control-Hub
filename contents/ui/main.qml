@@ -200,6 +200,7 @@ PlasmoidItem {
                                             height: width
                                             anchors.horizontalCenter: parent.horizontalCenter
                                             anchors.verticalCenter: parent.verticalCenter
+                                            color: Kirigami.Theme.TextColor
                                             source: Funcs.getBtDevice() === "Disabled" ? Funcs.getBtDevice() === "Unavailable" ? "bluetooth-disabled-symbolic" : "bluetooth-active-symbolic" : "bluetooth-active-symbolic"
                                         }
                                         MouseArea {
@@ -333,14 +334,16 @@ PlasmoidItem {
                                         onClicked: {
                                             minimalweatherAndToggles.visible = true
                                         }
-                                    PlasmaComponents3.Label  {
-                                        text:  "Forecast of the weather"
+                                }
+                                 PlasmaComponents3.Label  {
+                                        text:  "weather forecast"
                                         width: parent.width - arrowbutton.width
-                                        wrapMode: Text.WordWrap
-                                        maximumLineCount: 2
+                                        horizontalAlignment: Text.AlignHCenter
+                                        verticalAlignment: Text.AlignVCenter
+                                        font.bold: true
+                                        font.pixelSize: tomorrowDayText.font.pixelSize*1.2
 
                                     }
-                                }
                                 }
                                 Row {
                                     id: twofullweather
@@ -518,10 +521,17 @@ PlasmoidItem {
                                     width: parent.width*.35
                                     height: parent.height
                                     Rectangle {
+                                        id: propertyColorText
+                                        color: Kirigami.Theme.TextColor
+                                        width: 1
+                                        height: 1
+                                        visible: false
+                                    }
+                                    Rectangle {
                                         id: rectangleBackgroundTemperature
                                         width: parent.width < parent.height ? parent.width*.85 : parent.height*.85
                                         height: width
-                                        color: "#26000000"
+                                        color: ((propertyColorText.color).toString())[0]+"23"+((propertyColorText.color).toString())[1]+((propertyColorText.color).toString())[2]+((propertyColorText.color).toString())[3]+((propertyColorText.color).toString())[4]+((propertyColorText.color).toString())[5]+((propertyColorText.color).toString())[6]
                                         radius: width/2
                                         anchors.verticalCenter: parent.verticalCenter
                                         anchors.horizontalCenter: parent.horizontalCenter
@@ -535,7 +545,7 @@ PlasmoidItem {
                                                 anchors.topMargin: (rectangleBackgroundTemperature.height-tem2.height)/2
                                                 PlasmaComponents3.Label {
                                                     id: tem2
-                                                    text: Number(weatherData.temperaturaActual)
+                                                    text: Math.round(Number(weatherData.temperaturaActual))
                                                     font.pixelSize: rectangleBackgroundTemperature.height*.3
                                                     font.bold: true
                                                 }
@@ -565,7 +575,7 @@ PlasmoidItem {
                                             wrapMode: Text.WordWrap
                                             elide: Text.ElideRight
                                             maximumLineCount: 2
-                                             horizontalAlignment: Text.AlignLeft // Centra horizontalmente
+                                            horizontalAlignment: Text.AlignHCenter
                                         }
                                     }
                                 }
@@ -597,8 +607,8 @@ PlasmoidItem {
                                         width: parent.width
                                         height: parent.height*.6
                                         Kirigami.Icon {
-                                            width: parent.height
-                                            height: width
+                                            id: iconOfRedshift
+                                            implicitHeight: parent.height*.9
                                             visible: true
                                             anchors.verticalCenter: parent.verticalCenter
                                             anchors.horizontalCenter: parent.horizontalCenter
@@ -667,7 +677,7 @@ PlasmoidItem {
                                                     }
 
                                             }
-                                            font.pixelSize: labelredfish.height*.4
+                                            font.pixelSize: labelredfish.height*.35
                                             horizontalAlignment: Text.AlignHCenter
     }
                                     }
@@ -689,7 +699,46 @@ PlasmoidItem {
                                 anchors.left: parent.left
                                 width: parent.width
                                 height: parent.height
+                               Column {
+                                width: parent.width
+                                height: parent.height
 
+                                Item {
+                                    width: parent.width
+                                    height: parent.height*.6
+                                        Kirigami.Icon {
+                                            implicitHeight: parent.height*.9
+                                            color: Kirigami.Theme.TextColor
+                                            source: Funcs.checkInhibition() ? "notifications-disabled" : "notifications"
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            anchors.horizontalCenter: parent.horizontalCenter
+                                            MouseArea {
+                                                anchors.fill: parent
+                                                hoverEnabled: true
+                                                onClicked: Funcs.toggleDnd();
+                                            }
+                                        }
+                                }
+                                Item {
+                                    id: boxDontDisturb
+                                    width: parent.width
+                                    height: parent.height*.4
+
+                                        PlasmaComponents3.Label {
+                                            id: textdontDis
+                                            text: i18n("Don't Disturb")
+                                            width: parent.width*.9
+                                            font.pixelSize: weatherToggle.height < weatherToggle.width ? weatherToggle.height*.14 : weatherToggle.width*.14
+                                            wrapMode: Text.WordWrap
+                                            elide: Text.ElideRight
+                                            maximumLineCount: 2
+                                            verticalAlignment: Text.AlignVCenter
+                                            horizontalAlignment: Text.AlignHCenter
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            //font.bold: true
+                                        }
+                                }
+                            }
                             }
                         }
                     }
@@ -709,6 +758,7 @@ PlasmoidItem {
                     anchors.left: parent.left
                     width: parent.width
                     height: parent.height - 5
+
                 }
             }
 
