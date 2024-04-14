@@ -315,8 +315,17 @@ Item {
     property string temperaturaActual: obtener(datosweather, 1)
     property string codeleng: ((Qt.locale().name)[0]+(Qt.locale().name)[1])
     property string codeweather: obtener(datosweather, 10)
+    property string codeweatherTomorrow: obtener(datosweather, 11)
+    property string codeweatherDayAftertomorrow: obtener(datosweather, 12)
+    property string codeweatherTwoDaysAfterTomorrow: obtener(datosweather, 13)
     property string minweatherCurrent: obtener(datosweather, 2)
     property string maxweatherCurrent: obtener(datosweather, 6)
+    property string minweatherTomorrow: obtener(datosweather, 3)
+    property string maxweatherTomorrow: obtener(datosweather, 7)
+    property string minweatherDayAftertomorrow: obtener(datosweather, 4)
+    property string maxweatherDayAftertomorrow: obtener(datosweather, 8)
+    property string minweatherTwoDaysAfterTomorrow: obtener(datosweather, 5)
+    property string maxweatherTwoDaysAfterTomorrow: obtener(datosweather, 9)
     property string iconWeatherCurrent: asingicon()
 
     property string weathertext: weatherCodeText(codeleng, codeweather)
@@ -351,7 +360,7 @@ Item {
     function executeCommand() {
         executable.exec(command)
     }
-    function asingicon(){
+    function asingicon(x){
             let wmocodes = {
               0 : "clear",
               1 : "few-clouds",
@@ -380,9 +389,9 @@ Item {
               96 : "storm",
               99 : "storm",
                      }
-            var cicloOfDay = isday()
+            var cicloOfDay = "day"
 
-            var iconName = "weather-" + (wmocodes[codeweather] || "unknown") + "-" + cicloOfDay
+            var iconName = "weather-" + (wmocodes[x] || "unknown") + "-" + cicloOfDay
 
     return iconName
     }

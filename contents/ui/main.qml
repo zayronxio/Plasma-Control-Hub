@@ -51,6 +51,11 @@ PlasmoidItem {
 
     property string iconNotifications: "notifications"
 
+    property string tomorrow: Funcs.sumarDia(1)
+    property string dayAftertomorrow: Funcs.sumarDia(2)
+    property string twoDaysAfterTomorrow: Funcs.sumarDia(3)
+    property int daymostlegth: tomorrow.length < dayAftertomorrow.length ? dayAftertomorrow.length < twoDaysAfterTomorrow.length ? twoDaysAfterTomorrow.length : dayAftertomorrow.length : tomorrow.length < twoDaysAfterTomorrow.length ? twoDaysAfterTomorrow.length : tomorrow.length
+
     compactRepresentation: MouseArea {
         id: compactRoot
 
@@ -301,8 +306,202 @@ PlasmoidItem {
                         visible: false
                     }
                     Column {
+                        id: fullweather
+                        width: parent.width -5
+                        height: parent.height
+                        visible: minimalweatherAndToggles.visible == true ? false : true
+
+                        KSvg.FrameSvgItem {
+                            imagePath: "opaque/dialogs/background"
+                            clip: true
+                            anchors.right: parent.right
+                            anchors.left: parent.left
+                            width: parent.width
+                            height: parent.height - 5
+                            Column {
+                                width: parent.width
+                                height: parent.height
+                                Row {
+                                    id: onefullweather
+                                    width: parent.width
+                                    height: parent.height*.16
+                                    PlasmaComponents3.ToolButton {
+                                        id: arrowbutton
+                                        width: 22
+                                        Layout.preferredHeight: parent.height
+                                        icon.name: "arrow-left"
+                                        onClicked: {
+                                            minimalweatherAndToggles.visible = true
+                                        }
+                                    PlasmaComponents3.Label  {
+                                        text:  "Forecast of the weather"
+                                        width: parent.width - arrowbutton.width
+                                        wrapMode: Text.WordWrap
+                                        maximumLineCount: 2
+
+                                    }
+                                }
+                                }
+                                Row {
+                                    id: twofullweather
+                                    width: parent.width
+                                    height: parent.height*.28
+                                    Kirigami.Icon {
+                                        id: tomorrowWeatherIcon
+                                        width: parent.height*.7
+                                        source: weatherData.asingicon(weatherData.codeweatherTomorrow)
+                                        anchors.verticalCenter: twofullweather.verticalCenter // Centrar verticalmente
+
+                                    }
+                                    PlasmaComponents3.Label  {
+                                        id: tomorrowDayText
+                                        width: parent.width-maxAndMincTomorrow.width-tomorrowWeatherIcon.height-5
+                                        height: parent.height
+                                        text:  tomorrow
+                                        font.pixelSize: daymostlegth < 5 ? fullweather.width*.085 : fullweather.width*.07
+                                        horizontalAlignment: Text.AlignHCenter
+                                        verticalAlignment: Text.AlignVCenter
+                                    }
+                                    Row {
+                                        id: maxAndMincTomorrow
+                                        spacing: 2.5
+                                        height: parent.height
+                                        width: minTomorrow.width+separatorTomorrow.width+maxTomorrow.width+10
+                                        PlasmaComponents3.Label  {
+                                            id: minTomorrow
+                                            height: parent.height
+                                            font.pixelSize: tomorrowDayText.font.pixelSize
+                                            text: weatherData.minweatherTomorrow+"°"
+                                            verticalAlignment: Text.AlignVCenter
+
+                                        }
+                                    PlasmaComponents3.Label  {
+                                        id: separatorTomorrow
+                                        height: parent.height
+                                        font.pixelSize: tomorrowDayText.font.pixelSize
+                                        text:  "|"
+                                        verticalAlignment: Text.AlignVCenter
+                                    }
+                                    PlasmaComponents3.Label  {
+                                        id: maxTomorrow
+                                        text:  weatherData.maxweatherTomorrow+"°"
+                                        font.pixelSize: tomorrowDayText.font.pixelSize
+                                        height: parent.height
+                                        verticalAlignment: Text.AlignVCenter
+                                    }
+                                    }
+                                }
+                                Row {
+                                    id: threefullweather
+                                    width: parent.width
+                                    height: parent.height*.28
+                                    Kirigami.Icon {
+                                        id: dayAftertomorrowWeatherIcon
+                                        width: parent.height*.7
+                                        source: weatherData.asingicon(weatherData.codeweatherDayAftertomorrow)
+                                        anchors.verticalCenter: threefullweather.verticalCenter // Centrar verticalmente
+
+                                    }
+                                     PlasmaComponents3.Label  {
+                                        width: parent.width-maxAndMincTomorrow.width-tomorrowWeatherIcon.height-5
+                                        height: parent.height
+                                        text: dayAftertomorrow
+                                        font.pixelSize: tomorrowDayText.font.pixelSize
+                                        horizontalAlignment: Text.AlignHCenter
+                                        verticalAlignment: Text.AlignVCenter
+                                    }
+                                    Row {
+                                        id: maxAndMinDayAftertomorrow
+                                        spacing: 2.5
+                                        height: parent.height
+                                        width: minDayAftertomorrow.width+separatorDayAftertomorrow.width+maxDayAftertomorrow.width+10
+                                        PlasmaComponents3.Label  {
+                                            id: minDayAftertomorrow
+                                            height: parent.height
+                                            font.pixelSize: tomorrowDayText.font.pixelSize
+                                            text: weatherData.minweatherDayAftertomorrow+"°"
+                                            verticalAlignment: Text.AlignVCenter
+
+                                        }
+                                    PlasmaComponents3.Label  {
+                                        id: separatorDayAftertomorrow
+                                        height: parent.height
+                                        font.pixelSize: tomorrowDayText.font.pixelSize
+                                        text:  "|"
+                                        verticalAlignment: Text.AlignVCenter
+                                    }
+                                    PlasmaComponents3.Label  {
+                                        id: maxDayAftertomorrow
+                                        text:  weatherData.maxweatherDayAftertomorrow+"°"
+                                        font.pixelSize: tomorrowDayText.font.pixelSize
+                                        height: parent.height
+                                        verticalAlignment: Text.AlignVCenter
+                                    }
+                                    }
+                                }
+                                Row {
+                                    id: fordfullweather
+                                    width: parent.width
+                                    height: parent.height*.28
+                                    Kirigami.Icon {
+                                        id: twoDaysAfterTomorrowWeatherIcon
+                                        width: parent.height*.7
+                                        source: weatherData.asingicon(weatherData.codeweatherTwoDaysAfterTomorrow)
+                                        anchors.verticalCenter: threefullweather.verticalCenter // Centrar verticalmente
+
+                                    }
+                                     PlasmaComponents3.Label  {
+                                        width: parent.width-maxAndMinTwoDaysAfterTomorrow.width-twoDaysAfterTomorrowWeatherIcon.height-5
+                                        height: parent.height
+                                        text:  twoDaysAfterTomorrow
+                                        font.pixelSize: tomorrowDayText.font.pixelSize
+                                        horizontalAlignment: Text.AlignHCenter
+                                        verticalAlignment: Text.AlignVCenter
+                                    }
+                                    Row {
+                                        id: maxAndMinTwoDaysAfterTomorrow
+                                        spacing: 2.5
+                                        height: parent.height
+                                        width: minTwoDaysAfterTomorrow.width+separatorTwoDaysAfterTomorrow.width+maxTwoDaysAfterTomorrow.width+10
+                                        PlasmaComponents3.Label  {
+                                            id: minTwoDaysAfterTomorrow
+                                            height: parent.height
+                                            font.pixelSize: tomorrowDayText.font.pixelSize
+                                            text: weatherData.minweatherTwoDaysAfterTomorrow+"°"
+                                            verticalAlignment: Text.AlignVCenter
+
+                                        }
+                                    PlasmaComponents3.Label  {
+                                        id: separatorTwoDaysAfterTomorrow
+                                        height: parent.height
+                                        font.pixelSize: tomorrowDayText.font.pixelSize
+                                        text:  "|"
+                                        verticalAlignment: Text.AlignVCenter
+                                    }
+                                    PlasmaComponents3.Label  {
+                                        id: maxTwoDaysAfterTomorrow
+                                        text:  weatherData.maxweatherTwoDaysAfterTomorrow+"°"
+                                        font.pixelSize: tomorrowDayText.font.pixelSize
+                                        height: parent.height
+                                        verticalAlignment: Text.AlignVCenter
+                                    }
+                                    }
+
+                                }
+                            }
+                        }
+                    }
+                    Column {
+                        id: minimalweatherAndToggles
                         width: parent.width -5
                         height: parent.height/2
+                        visible: true
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {
+                                minimalweatherAndToggles.visible = false
+                            }
+                        }
                         KSvg.FrameSvgItem {
 
                             imagePath: "opaque/dialogs/background"
@@ -319,45 +518,54 @@ PlasmoidItem {
                                     width: parent.width*.35
                                     height: parent.height
                                     Rectangle {
+                                        id: rectangleBackgroundTemperature
                                         width: parent.width < parent.height ? parent.width*.85 : parent.height*.85
                                         height: width
                                         color: "#26000000"
                                         radius: width/2
                                         anchors.verticalCenter: parent.verticalCenter
                                         anchors.horizontalCenter: parent.horizontalCenter
-                                        Kirigami.Icon {
-                                            width: parent.width*.8
-                                            height: width
-                                            color: Kirigima.Theme.TextColor
-                                            source: Funcs.checkInhibition() ? "notifications-disabled" : "notifications"
-                                            anchors.verticalCenter: parent.verticalCenter
-                                            anchors.horizontalCenter: parent.horizontalCenter
-                                            MouseArea {
-                                                anchors.fill: parent
-                                                hoverEnabled: true
-                                                onClicked: Funcs.toggleDnd();
+                                        Row {
+                                                id: textTemWeather2
+                                                width: tem2.width + numenclatura2.width
+                                                height: tem2.implicitHeight-5
+                                                anchors.leftMargin: (rectangleBackgroundTemperature.width-tem2.width)/2
+                                                anchors.left: parent.left
+                                                anchors.top: parent.top
+                                                anchors.topMargin: (rectangleBackgroundTemperature.height-tem2.height)/2
+                                                PlasmaComponents3.Label {
+                                                    id: tem2
+                                                    text: Number(weatherData.temperaturaActual)
+                                                    font.pixelSize: rectangleBackgroundTemperature.height*.3
+                                                    font.bold: true
+                                                }
+                                                PlasmaComponents3.Label {
+                                                    id: numenclatura2
+                                                    text: "°C"
+                                                    font.pixelSize: tem2.font.pixelSize*.7
+                                                    anchors.top: tem.top
+                                                    font.bold: true
+                                                }
                                             }
-                                        }
                                     }
                                 }
                                 Item {
-                                    id: boxDontDisturb
+                                    id: twc
                                     width: parent.width*.65
                                     height: parent.height
                                     Column {
                                         width: parent.width
-                                        height: textdontDis.height+subTextdontDis.height
+                                        height: weatherCurrent2.height
                                         anchors.verticalCenter: parent.verticalCenter
-                                        Label {
-                                            id: textdontDis
-                                            text: i18n("Don't Disturb")
-                                            font.pixelSize: boxDontDisturb.width*.11
-                                            font.bold: true
-                                        }
-                                        Label {
-                                            id: subTextdontDis
-                                            text: Funcs.checkInhibition() ? i18n("Off") : i18n("On")
-                                            font.pixelSize: boxDontDisturb.width*.09
+                                        PlasmaComponents3.Label {
+                                            id: weatherCurrent2
+                                            text: weatherData.weathertext
+                                            font.pixelSize: weatherData.weathertext.length < 11 ? twc.height*.2 : twc.height*.16
+                                            width: parent.width
+                                            wrapMode: Text.WordWrap
+                                            elide: Text.ElideRight
+                                            maximumLineCount: 2
+                                             horizontalAlignment: Text.AlignLeft // Centra horizontalmente
                                         }
                                     }
                                 }
@@ -370,6 +578,7 @@ PlasmoidItem {
                         width: parent.width -5
                         height: (parent.height/2) - 5
                         spacing: 5
+                        visible: minimalweatherAndToggles.visible
                         Item {
                             width: weatherToggle.visible ? (parent.width/2) - 2.5 : parent.width
                             height: parent.height
@@ -472,7 +681,7 @@ PlasmoidItem {
                             id: weatherToggle
                             width: (parent.width/2) -2.5
                             height: parent.height
-                            visible: visible // en espera de actualizacion
+                            visible: minimalweatherAndToggles.visible
                             KSvg.FrameSvgItem {
                                 imagePath: "opaque/dialogs/background"
                                 clip: true
@@ -480,98 +689,7 @@ PlasmoidItem {
                                 anchors.left: parent.left
                                 width: parent.width
                                 height: parent.height
-                                Column {
-                                    width: parent.width
-                                    height: parent.height
-                                    Rectangle {
-                                        width: logoweather.width + textTemWeather.width
-                                        height: parent.height/2.5
-                                        color: "transparent"
-                                        anchors.horizontalCenter: parent.horizontalCenter
-                                        Row {
-                                            id: backgroundOfIconWeather
-                                            width: parent.width
-                                            height: parent.height
-                                            Kirigami.Icon {
-                                                id: logoweather
-                                                source: weatherData.iconWeatherCurrent
-                                                width: height*.8
-                                                color: Kirigima.Theme.TextColor
-                                                anchors.verticalCenter: parent.verticalCenter // Centrar verticalmente
 
-
-                                            }
-                                            Rectangle {
-                                                width: logoweather.width*.1
-                                                height: parent.height
-                                                color: "transparent"
-                                            }
-                                            Row {
-                                                id: textTemWeather
-                                                width: tem.width + numenclatura.width
-                                                height: tem.implicitHeight-5
-                                                anchors.verticalCenter: parent.verticalCenter
-                                                PlasmaComponents3.Label {
-                                                    id: tem
-                                                    text: Number(weatherData.temperaturaActual)
-                                                    font.pixelSize:  backgroundOfIconWeather.height*.5
-                                                }
-                                                PlasmaComponents3.Label {
-                                                    id: numenclatura
-                                                    text: "°C"
-                                                    font.pixelSize: backgroundOfIconWeather.height*.3
-                                                    anchors.top: tem.top
-                                                }
-                                            }
-
-                                        }
-
-                                    }
-                                    Column {
-                                        id: weatherandmaxmin
-                                        width: parent.width
-                                        height: weatherToggle.height*.6
-                                        spacing: 2
-
-                                        PlasmaComponents3.Label {
-                                            id: weatherCurrent
-                                            text: weatherData.weathertext
-                                            font.pixelSize: weatherData.weathertext.length < 11 ? parent.height*.35 : parent.height*.25
-                                            width: parent.width
-                                            wrapMode: Text.WordWrap
-                                            elide: Text.ElideRight
-                                            maximumLineCount: 2
-                                            horizontalAlignment: Text.AlignHCenter // Centra horizontalmente
-                                        }
-
-
-                                            Row {
-                                            height: parent.height-weatherCurrent.height
-                                            anchors.horizontalCenter: parent.horizontalCenter
-                                            spacing: parent.height/6
-                                            PlasmaComponents3.Label {
-                                                id: gradosdeTemMin
-                                                text: weatherData.minweatherCurrent
-                                                font.pixelSize: weatherData.weathertext.length < 11 ? parent.height*.45 : parent.height*.3
-                                                verticalAlignment: Text.AlignVCenter // Alineación vertical centrada
-                                            }
-                                            PlasmaComponents3.Label {
-                                                id: separatorgradosdeTem
-                                                text: "|"
-                                                font.pixelSize: weatherData.weathertext.length < 11 ? parent.height*.45 : parent.height*.3
-                                                verticalAlignment: Text.AlignVCenter // Alineación vertical centrada
-                                            }
-                                            PlasmaComponents3.Label {
-                                                id: gradosdeTemMax
-                                                text: weatherData.maxweatherCurrent
-                                                font.pixelSize: weatherData.weathertext.length < 11 ? parent.height*.45 : parent.height*.3
-                                                verticalAlignment: Text.AlignVCenter // Alineación vertical centrada
-                                            }
-                                        }
-
-                                    }
-
-                                }
                             }
                         }
                     }
@@ -871,6 +989,10 @@ PlasmoidItem {
         repeat: true
         onTriggered: {
             weatherData.executeCommand()
+            tomorrow = Funcs.sumarDia(1)
+            dayAftertomorrow = Funcs.sumarDia(2)
+            twoDaysAfterTomorrow = Funcs.sumarDia(3)
+
         }
     }
      Timer {
