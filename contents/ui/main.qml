@@ -54,7 +54,6 @@ PlasmoidItem {
     property string tomorrow: Funcs.sumarDia(1)
     property string dayAftertomorrow: Funcs.sumarDia(2)
     property string twoDaysAfterTomorrow: Funcs.sumarDia(3)
-    property int daymostlegth: tomorrow.length < dayAftertomorrow.length ? dayAftertomorrow.length < twoDaysAfterTomorrow.length ? twoDaysAfterTomorrow.length : dayAftertomorrow.length : tomorrow.length < twoDaysAfterTomorrow.length ? twoDaysAfterTomorrow.length : tomorrow.length
 
     compactRepresentation: MouseArea {
         id: compactRoot
@@ -94,8 +93,8 @@ PlasmoidItem {
 
     fullRepresentation: Item {
         id: menu
-        implicitHeight: brillo.visible ? 410 : 350
-        implicitWidth: 320
+        implicitHeight: brillo.visible ? 410 : 380
+        implicitWidth: 335
 
         // Lists all available network connections
         Components.SectionNetworks{
@@ -341,7 +340,7 @@ PlasmoidItem {
                                         horizontalAlignment: Text.AlignHCenter
                                         verticalAlignment: Text.AlignVCenter
                                         font.bold: true
-                                        font.pixelSize: tomorrowDayText.font.pixelSize*1.2
+                                        font.pixelSize: tomorrowDayText.font.pixelSize
 
                                     }
                                 }
@@ -360,8 +359,8 @@ PlasmoidItem {
                                         id: tomorrowDayText
                                         width: parent.width-maxAndMincTomorrow.width-tomorrowWeatherIcon.height-5
                                         height: parent.height
-                                        text:  tomorrow
-                                        font.pixelSize: daymostlegth < 5 ? fullweather.width*.085 : fullweather.width*.07
+                                        text:  tomorrow.substring(0, 3)
+                                        font.pixelSize: fullweather.width*.085
                                         horizontalAlignment: Text.AlignHCenter
                                         verticalAlignment: Text.AlignVCenter
                                     }
@@ -408,7 +407,7 @@ PlasmoidItem {
                                      PlasmaComponents3.Label  {
                                         width: parent.width-maxAndMincTomorrow.width-tomorrowWeatherIcon.height-5
                                         height: parent.height
-                                        text: dayAftertomorrow
+                                        text: dayAftertomorrow.substring(0, 3)
                                         font.pixelSize: tomorrowDayText.font.pixelSize
                                         horizontalAlignment: Text.AlignHCenter
                                         verticalAlignment: Text.AlignVCenter
@@ -456,7 +455,7 @@ PlasmoidItem {
                                      PlasmaComponents3.Label  {
                                         width: parent.width-maxAndMinTwoDaysAfterTomorrow.width-twoDaysAfterTomorrowWeatherIcon.height-5
                                         height: parent.height
-                                        text:  twoDaysAfterTomorrow
+                                        text:  twoDaysAfterTomorrow.substring(0, 3)
                                         font.pixelSize: tomorrowDayText.font.pixelSize
                                         horizontalAlignment: Text.AlignHCenter
                                         verticalAlignment: Text.AlignVCenter
