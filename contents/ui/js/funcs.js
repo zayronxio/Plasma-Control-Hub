@@ -34,7 +34,6 @@ function toggleBluetooth()
     }
 }
 
-
 function checkInhibition() {
     var inhibited = false;
 

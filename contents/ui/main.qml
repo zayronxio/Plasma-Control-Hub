@@ -8,17 +8,16 @@ import org.kde.kirigami as Kirigami
 import org.kde.ksvg as KSvg
 import Qt5Compat.GraphicalEffects
 import org.kde.plasma.private.mpris as Mpris
-import org.kde.plasma.private.volume 0.1 as Vol
+import org.kde.plasma.private.volume
+import org.kde.plasma.plasma5support 2.0 as P5Support
 import "js/funcs.js" as Funcs
 import "lib" as Lib
 import org.kde.bluezqt 1.0 as BluezQt
 import org.kde.kcmutils // KCMLauncher
 import org.kde.plasma.networkmanagement as PlasmaNM
 import "components" as Components
-
 import org.kde.plasma.private.brightnesscontrolplugin
 import org.kde.notificationmanager as NotificationManager
-
 
 PlasmoidItem {
     id: root
@@ -41,12 +40,15 @@ PlasmoidItem {
     WeatherData {
 		id: weatherData
 	}
-    // Audio source
-    property var sink: paSinkModel.preferredSink
-    readonly property bool sinkAvailable: sink && !(sink && sink.name == "auto_null")
-    readonly property Vol.SinkModel paSinkModel: Vol.SinkModel {
-        id: paSinkModel
+
+	UserInfo {
+        id: userInfo
     }
+
+    // Audio source
+    property var sink: PreferredDevice.sink
+    readonly property bool sinkAvailable: sink && !(sink && sink.name == "auto_null")
+
     readonly property bool isVertical: Plasmoid.formFactor === PlasmaCore.Types.Vertical
 
     property string iconNotifications: "notifications"
@@ -54,6 +56,26 @@ PlasmoidItem {
     property string tomorrow: Funcs.sumarDia(1)
     property string dayAftertomorrow: Funcs.sumarDia(2)
     property string twoDaysAfterTomorrow: Funcs.sumarDia(3)
+
+    property bool infoUserAvailable: Plasmoid.configuration.userAndAvaAveilable
+
+    // brightnesscontrolplugin
+    readonly property int brightnessMax: sbControl.brightnessMax
+    readonly property int brightnessMin: (brightnessMax > 100 ? 1 : 0)
+
+    property int screenBrightness: sbControl.brightness
+    property bool disableBrightnessUpdate: true
+
+    P5Support.DataSource {
+        id: pmEngine
+        engine: "powermanagement"
+        connectedSources: ["PowerDevil", "Sleep States"]
+        function performOperation(what) {
+            var service = serviceForSource("PowerDevil")
+            var operation = service.operationDescription(what)
+            service.startOperationCall(operation)
+        }
+    }
 
     compactRepresentation: MouseArea {
         id: compactRoot
@@ -86,6 +108,7 @@ PlasmoidItem {
                     width: parent.width
                     height: parent.height
                     source: "configure"
+                    color: Kirigami.Theme.TextColor
                 }
             }
         }
@@ -109,11 +132,71 @@ PlasmoidItem {
             anchors.verticalCenter: parent.verticalCenter
             width: menu.width
             height: menu.height
+            Item {
+                id: username
+                width: parent.width
+                height: parent.height*.1
+                visible: infoUserAvailable
+                KSvg.FrameSvgItem {
+                    id: backgroundNameInfo // seccion de botones de red, bluetooth y config
+                    imagePath: "opaque/dialogs/background"
+                    clip: true
+                    anchors.right: parent.right
+                    anchors.left: parent.left
+                    width: parent.width - 5
+                    height: parent.height - 5
+                    Rectangle {
+                        id: maskavatar
+                        height: parent.height*.75
+                        width: height
+                        radius: height/2
+                        visible: false
+                    }
+                    Image {
+                        id: avatar
+                        source: userInfo.urlAvatar
+                        height: parent.height*.75
+                        width: height
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.left: parent.left
+                        anchors.leftMargin: height/2
+                        layer.enabled: true
+                        layer.effect: OpacityMask {
+                            maskSource: maskavatar
+                            }
+                        }
 
+                    PlasmaComponents3.Label {
+                        height: parent.height
+                        anchors.left: parent.left
+                        anchors.leftMargin: avatar.height*2
+                        verticalAlignment: Text.AlignVCenter
+                        font.bold: true
+                        text: userInfo.name
+                    }
+
+                    Kirigami.Icon {
+                        source: "system-shutdown.svg"
+                        width: parent.height*.8
+                        height: width
+                        anchors.right: parent.right
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.rightMargin: parent.height/3
+                        MouseArea {
+                            height: parent.height
+                            width: parent.width
+                            anchors.centerIn: parent
+                            onClicked: {
+                                pmEngine.performOperation("requestShutDown")
+                            }
+                        }
+                    }
+                }
+            }
             Row {
                 id: utilities // Primera mitad el widget
                 width: parent.width
-                height: brillo.visible ? parent.height*.4 : parent.height*.5
+                height: brillo.visible ? (infoUserAvailable ? wrapper.height*.9 : wrapper.height)*.4 : (infoUserAvailable ? wrapper.height*.9 : wrapper.height)*.5
                 spacing: 5
                 Column {
                     width: parent.width/2
@@ -143,16 +226,13 @@ PlasmoidItem {
                                         color: Kirigami.Theme.highlightColor
                                         anchors.horizontalCenter: parent.horizontalCenter
                                         anchors.verticalCenter: parent.verticalCenter
-                                        width: parent.height*.7
+                                        width: parent.height*.6
                                         height: width
                                         radius: height/2
                                         Kirigami.Icon {
-                                            id: networkIcon
-                                            width: parent.width*.8
-                                            height: width
-                                            color: "white"
-                                            anchors.horizontalCenter: parent.horizontalCenter
-                                            anchors.verticalCenter: parent.verticalCenter
+                                            implicitWidth: parent.width*.8
+                                            color: Kirigami.Theme.TextColor
+                                            anchors.centerIn: parent
                                             source: network.activeConnectionIcon
                                         }
                                         MouseArea {
@@ -190,16 +270,14 @@ PlasmoidItem {
                                         color: Kirigami.Theme.highlightColor
                                         anchors.horizontalCenter: parent.horizontalCenter
                                         anchors.verticalCenter: parent.verticalCenter
-                                        width: parent.height*.7
+                                        width: parent.height*.6
                                         height: width
                                         radius: height/2
                                         Kirigami.Icon {
                                             id: bluetoothIcon
-                                            width: parent.width*.8
-                                            height: width
-                                            anchors.horizontalCenter: parent.horizontalCenter
-                                            anchors.verticalCenter: parent.verticalCenter
+                                            implicitWidth: parent.width*.8
                                             color: Kirigami.Theme.TextColor
+                                            anchors.centerIn: parent
                                             source: Funcs.getBtDevice() === "Disabled" ? Funcs.getBtDevice() === "Unavailable" ? "bluetooth-disabled-symbolic" : "bluetooth-active-symbolic" : "bluetooth-active-symbolic"
                                         }
                                         MouseArea {
@@ -246,17 +324,15 @@ PlasmoidItem {
                                         color: Kirigami.Theme.highlightColor
                                         anchors.horizontalCenter: parent.horizontalCenter
                                         anchors.verticalCenter: parent.verticalCenter
-                                        width: parent.height*.7
+                                        width: parent.height*.6
                                         height: width
                                         radius: height/2
 
                                         Kirigami.Icon {
                                             id: settingsIcon
-                                            width: parent.width*.8
-                                            height: width
-                                            color: "white"
-                                            anchors.horizontalCenter: parent.horizontalCenter
-                                            anchors.verticalCenter: parent.verticalCenter
+                                            implicitWidth: parent.width*.8
+                                            color: Kirigami.Theme.TextColor
+                                            anchors.centerIn: parent
                                             source: "configure"
                                         }
                                             MouseArea {
@@ -281,7 +357,7 @@ PlasmoidItem {
                                                     id: nameSettigns
                                                     width: parent.width*.9
                                                     text: i18n("Settings")
-                                                    font.pixelSize: setting.height*.22
+                                                    font.pixelSize: bluetooth.height*.22
                                                     font.bold: true
                                                 }
                                                 PlasmaComponents3.Label {
@@ -589,8 +665,10 @@ PlasmoidItem {
                         spacing: 5
                         visible: minimalweatherAndToggles.visible
                         Item {
+                            id: itemredshitbutton
                             width: weatherToggle.visible ? (parent.width/2) - 2.5 : parent.width
                             height: parent.height
+                            visible: true
                             KSvg.FrameSvgItem {
                                 imagePath: "opaque/dialogs/background"
                                 clip: true
@@ -608,49 +686,13 @@ PlasmoidItem {
                                         Kirigami.Icon {
                                             id: iconOfRedshift
                                             implicitHeight: parent.height*.9
-                                            visible: true
+
                                             anchors.verticalCenter: parent.verticalCenter
                                             anchors.horizontalCenter: parent.horizontalCenter
-                                            source: {
-                                                if (!monitor.enabled) {
-                                                    return "redshift-status-off"; // not configured: show generic night light icon rather "manually turned off"icon
-                                                    } else if (!monitor.running) {
-                                                        return "redshift-status-on";
-
-                                                    } else if (monitor.daylight && monitor.targetTemperature != 6500) { // show daylight icon only when temperature during the day is actually modified
-                                                        return "redshift-status-day";
-
-                                                    } else {
-                                                        return "redshift-status-on";
-
-                                                    }
-                                                }
+                                            source: control.running ? "redshift-status-on" : "redshift-status-off"
                                                 MouseArea {
                                                     anchors.fill: parent
-                                                    onClicked: toggleInhibition()
-                                                    function toggleInhibition() {
-                                                        if (!monitor.available) {
-                                                            return;
-                                                        }
-                                                        switch (inhibitor.state) {
-                                                            case NightColorInhibitor.Inhibiting:
-                                                            case NightColorInhibitor.Inhibited:
-                                                                inhibitor.uninhibit();
-                                                                break;
-                                                            case NightColorInhibitor.Uninhibiting:
-                                                            case NightColorInhibitor.Uninhibited:
-                                                                inhibitor.inhibit();
-                                                                break;
-                                                        }
-                                                    }
-                                                    NightColorInhibitor {
-                                                        id: inhibitor
-                                                    }
-                                                    NightColorMonitor {
-                                                        id: monitor
-                                                        readonly property bool transitioning: monitor.currentTemperature != monitor.targetTemperature
-                                                        readonly property bool hasSwitchingTimes: monitor.mode != 3
-                                                    }
+                                                    onClicked: control.toggleInhibition()
                                                 }
                                         }
                                     }
@@ -661,21 +703,7 @@ PlasmoidItem {
                                          Label {
                                              id: textOfNightLight
                                              width: parent.width
-                                             text: {
-                                                if (!monitor.enabled) {
-                                                    return i18n("Off"); // not configured: show generic night light icon rather "manually turned off"icon
-                                                    } else if (!monitor.running) {
-                                                        return  i18n("On");
-
-                                                    } else if (monitor.daylight && monitor.targetTemperature != 6500) { // show daylight icon only when temperature during the day is actually modified
-                                                        return  i18n("Off");
-
-                                                    } else {
-                                                        return  i18n("On");
-
-                                                    }
-
-                                            }
+                                             text: control.running ? "On" : "Off"
                                             font.pixelSize: labelredfish.height*.35
                                             horizontalAlignment: Text.AlignHCenter
     }
@@ -685,10 +713,17 @@ PlasmoidItem {
 
                                 }
                             }
+                            NightLightControl {
+                                id: control
+
+                                readonly property bool transitioning: control.currentTemperature != control.targetTemperature
+                                readonly property bool hasSwitchingTimes: control.mode != 3
+                                readonly property bool togglable: !control.inhibited || control.inhibitedFromApplet
+                            }
                         }
                         Item {
                             id: weatherToggle
-                            width: (parent.width/2) -2.5
+                            width: itemredshitbutton.visible ? (parent.width/2) -2.5 : (parent.width) -2.5
                             height: parent.height
                             visible: minimalweatherAndToggles.visible
                             KSvg.FrameSvgItem {
@@ -725,15 +760,15 @@ PlasmoidItem {
 
                                         PlasmaComponents3.Label {
                                             id: textdontDis
-                                            text: i18n("Don't Disturb")
-                                            width: parent.width*.9
-                                            font.pixelSize: weatherToggle.height < weatherToggle.width ? weatherToggle.height*.14 : weatherToggle.width*.14
+                                            text: i18n("Don't\nDisturb")
+                                            width: parent.width
+                                            font.pixelSize: weatherToggle.height < weatherToggle.width ? weatherToggle.height*.15 : weatherToggle.width*.15
                                             wrapMode: Text.WordWrap
                                             elide: Text.ElideRight
                                             maximumLineCount: 2
                                             verticalAlignment: Text.AlignVCenter
                                             horizontalAlignment: Text.AlignHCenter
-                                            anchors.verticalCenter: parent.verticalCenter
+
                                             //font.bold: true
                                         }
                                 }
@@ -748,7 +783,7 @@ PlasmoidItem {
             Item {
                 id: brillo
                 width: parent.width
-                height: parent.height*.2
+                height: (infoUserAvailable ? wrapper.height*.9 : wrapper.height)*.2
                 visible: false // en espera de actualizacion
                 KSvg.FrameSvgItem {
                     imagePath: "opaque/dialogs/background"
@@ -764,7 +799,7 @@ PlasmoidItem {
             Item {
                 id: volumen
                 width: parent.width
-                height: brillo.visible ? parent.height*.2 : parent.height*.25
+                height: brillo.visible ? (infoUserAvailable ? wrapper.height*.9 : wrapper.height)*.2 : (infoUserAvailable ? wrapper.height*.9 : wrapper.height)*.25
                  KSvg.FrameSvgItem {
                      id: windowsvolumen
 
@@ -826,11 +861,11 @@ PlasmoidItem {
                             height: parent.height/2
                             anchors.bottom: parent.bottom
                             from: 1
-                            value: (sink.volume / Vol.PulseAudio.NormalVolume * 100)
+                            value: (sink.volume / PulseAudio.NormalVolume * 100)
                             to: 100
                             snapMode: Slider.SnapAlways
                             onMoved: {
-                                sink.volume = value * Vol.PulseAudio.NormalVolume / 100
+                                sink.volume = value * PulseAudio.NormalVolume / 100
                             }
                             background: Rectangle {
                                 id: backOfSlider
@@ -847,8 +882,9 @@ PlasmoidItem {
                                     radius: height/2
                                     Kirigami.Icon {
                                         id: maskvolumenicon
-                                        width: parent.height*.9
-                                        source: "volume-level-high-panel"
+                                        width: parent.height*.7
+                                        height: width
+                                        source: "audio-volume-high-symbolic"
                                         anchors.verticalCenter: parent.verticalCenter
 
                                     }
@@ -862,7 +898,7 @@ PlasmoidItem {
 
                                         }
                                         anchors.verticalCenter: parent.verticalCenter
-                                        opacity: .4
+                                        opacity: .9
 
                                     }
 
@@ -889,7 +925,7 @@ PlasmoidItem {
             Item {
                 id: mutimedia
                 width: parent.width
-                height: brillo.visible ? parent.height*.2 : parent.height*.25
+                height: brillo.visible ? (infoUserAvailable ? wrapper.height*.9 : wrapper.height)*.2 : (infoUserAvailable ? wrapper.height*.9 : wrapper.height)*.25
 
                 KSvg.FrameSvgItem {
                     id: rect

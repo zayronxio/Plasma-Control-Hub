@@ -14,6 +14,8 @@ Item {
     property alias cfg_longitudeC: longitude.text
     property alias cfg_useCoordinatesIp: autamateCoorde.checked
 
+    property alias cfg_userAndAvaAveilable: usrCheck.checked
+
     ColumnLayout {
         spacing: units.smallSpacing * 2
 
@@ -61,6 +63,17 @@ ColumnLayout {
 
         }
    }
+   GridLayout {
+       columns: 2
+       Label {
+           width: configRoot.width/2
+           text: "Avatar And Name User"
+    }
+    CheckBox {
+        id: usrCheck
+
+    }
+}
 
 }
 
