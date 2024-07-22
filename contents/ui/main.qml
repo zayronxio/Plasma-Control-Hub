@@ -11,6 +11,7 @@ import org.kde.plasma.private.mpris as Mpris
 import org.kde.plasma.private.volume
 import org.kde.plasma.plasma5support 2.0 as P5Support
 import "js/funcs.js" as Funcs
+import "js/uiTranslator.js" as UiTranslator
 import "lib" as Lib
 import org.kde.bluezqt 1.0 as BluezQt
 import org.kde.kcmutils // KCMLauncher
@@ -21,6 +22,8 @@ import org.kde.notificationmanager as NotificationManager
 
 PlasmoidItem {
     id: root
+
+    property string codelang: ((Qt.locale().name)[0]+(Qt.locale().name)[1])
 
     // BLUETOOTH
     property QtObject btManager : BluezQt.Manager
@@ -37,9 +40,9 @@ PlasmoidItem {
         id: notificationSettings
     }
 
-    WeatherData {
-		id: weatherData
-	}
+    Components.WeatherData {
+        id: weatherData
+    }
 
 	UserInfo {
         id: userInfo
@@ -251,7 +254,7 @@ PlasmoidItem {
                                         id: nameNetwork
                                         anchors.verticalCenter: parent.verticalCenter
                                         width: parent.width*.9
-                                        text: i18n("Network")
+                                        text: UiTranslator.getTranslateInJs(codelang, "Network")
                                         font.pixelSize: networkItem.height*.22
                                         font.bold: true
                                     }
@@ -299,7 +302,7 @@ PlasmoidItem {
                                         PlasmaComponents3.Label {
                                             id: nameBluetooth
                                             width: parent.width*.9
-                                            text: i18n("Bluetooth")
+                                            text: UiTranslator.getTranslateInJs(codelang, "Bluetooth")
                                             font.pixelSize: bluetooth.height*.22
                                             font.bold: true
                                         }
@@ -356,14 +359,14 @@ PlasmoidItem {
                                                 PlasmaComponents3.Label {
                                                     id: nameSettigns
                                                     width: parent.width*.9
-                                                    text: i18n("Settings")
+                                                    text: UiTranslator.getTranslateInJs(codelang, "Settings")
                                                     font.pixelSize: bluetooth.height*.22
                                                     font.bold: true
                                                 }
                                                 PlasmaComponents3.Label {
                                                     id: subNameSettigns
                                                     width: parent.width*.9
-                                                    text: i18n("System Settings")
+                                                    text: UiTranslator.getTranslateInJs(codelang, "System Settings")
                                                     font.pixelSize: nameSettigns.font.pixelSize*.8
                                                 }
                                             }
@@ -411,7 +414,7 @@ PlasmoidItem {
                                         }
                                 }
                                  PlasmaComponents3.Label  {
-                                        text:  "weather forecast"
+                                        text: UiTranslator.getTranslateInJs(codelang, "weather forecast")
                                         width: parent.width - arrowbutton.width
                                         horizontalAlignment: Text.AlignHCenter
                                         verticalAlignment: Text.AlignVCenter
@@ -644,7 +647,7 @@ PlasmoidItem {
                                         anchors.verticalCenter: parent.verticalCenter
                                         PlasmaComponents3.Label {
                                             id: weatherCurrent2
-                                            text: weatherData.weathertext
+                                            text: weatherData.weatherLongtext
                                             font.pixelSize: weatherData.weathertext.length < 11 ? twc.height*.2 : twc.height*.16
                                             width: parent.width
                                             wrapMode: Text.WordWrap
@@ -849,7 +852,7 @@ PlasmoidItem {
                             width: parent.width
                             height: parent.height/2
                             PlasmaComponents3.Label {
-                                text: i18n("Volume")
+                                text: UiTranslator.getTranslateInJs(codelang, "Volume")
                                 font.bold: true
                                 anchors.verticalCenter: parent.verticalCenter
                             }
