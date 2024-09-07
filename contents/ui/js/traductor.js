@@ -140,7 +140,7 @@ function weatherShortText(languageCode, code) {
             96: "Буря",
             99: "Буря"
         },
-        zh: {
+        zh-cn: {
             0: "晴朗",
             1: "晴朗",
             2: "多云",
@@ -167,6 +167,34 @@ function weatherShortText(languageCode, code) {
             95: "暴风",
             96: "暴风",
             99: "暴风"
+        },
+        zh-tw: {
+            0: "晴朗",
+            1: "晴朗",
+            2: "多雲",
+            3: "多雲",
+            51: "小雨",
+            53: "小雨",
+            55: "小雨",
+            56: "小雨",
+            57: "小雨",
+            61: "雨",
+            63: "雨",
+            65: "雨",
+            66: "雨",
+            67: "雨",
+            71: "雪",
+            73: "雪",
+            75: "雪",
+            77: "冰雹",
+            80: "陣雨",
+            81: "陣雨",
+            82: "陣雨",
+            85: "陣雨",
+            86: "陣雨",
+            95: "暴風",
+            96: "暴風",
+            99: "暴風"
         },
         pt: {
             0: "Claro",
@@ -599,7 +627,7 @@ function weatherLongText(languageCode, code) {
             96: "Гроза с небольшим градом",
             99: "Гроза с сильным градом"
         },
-        zh: {
+        zh-cn: {
             0: "晴",
             1: "晴间多云",
             2: "局部多云",
@@ -626,6 +654,34 @@ function weatherLongText(languageCode, code) {
             95: "雷暴",
             96: "雷暴并伴有小冰雹",
             99: "雷暴并伴有大冰雹"
+        },
+        zh-tw: {
+            0: "放晴",
+            1: "大致放晴",
+            2: "局部多雲",
+            3: "陰天",
+            51: "小雨",
+            53: "中雨",
+            55: "大雨",
+            56: "小凍雨",
+            57: "大凍雨",
+            61: "小雨夾雪",
+            63: "中雨夾雪",
+            65: "大雨夾雪",
+            66: "小冰雨",
+            67: "大冰雨",
+            71: "小雪",
+            73: "中雪",
+            75: "大雪",
+            77: "雪粒",
+            80: "小陣雨",
+            81: "中陣雨",
+            82: "大陣雨",
+            85: "小陣雪",
+            86: "大陣雪",
+            95: "雷暴",
+            96: "雷暴併伴有小冰雹",
+            99: "雷暴併伴有大冰雹"
         },
         ko: {
             0: "맑음",
@@ -674,7 +730,8 @@ function rainProbabilityText(languageCode) {
         "it": "Probabilità di pioggia",          // Italian
         "pt": "Probabilidade de chuva",   // Portuguese
         "ru": "Вероятность дождя",               // Russian
-        "zh": "降雨概率",                // Chinese (Mandarin)
+        "zh-cn": "降雨概率",                // Simplified Chinese (Mainland China)
+        "zh-tw": "降雨機率",                // Traditional Chinese (Taiwan)
         "ja": "降雨確率",         // Japanese
         "ko": "비 올 확률",            // Korean
         "nl": "Regenkans",          // Dutch
@@ -743,12 +800,19 @@ function lavelUV(languageCode, lavel) {
             3: "Очень Высокий",
             4: "Экстремальный"
         },
-        zh: {
+        zh-cn: {
             0: "低",
             1: "中等",
             2: "高",
             3: "很高",
             4: "极高"
+        },
+        zh-tw: {
+            0: "低",
+            1: "中等",
+            2: "高",
+            3: "很高",
+            4: "極高"
         },
         ja: {
             0: "低い",
@@ -798,7 +862,8 @@ function windSpeedText(languageCode) {
         "it": "Velocità del vento",
         "pt": "Velocidade do vento",
         "ru": "Скорость ветра",
-        "zh": "风速",
+        "zh-cn": "风速",
+        "zh-tw": "風速",
         "ja": "風速",
         "ko": "풍속",
         "nl": "Windsnelheid",
@@ -814,7 +879,8 @@ function windSpeedText(languageCode) {
         "it": "Vento",
         "pt": "Vento",
         "ru": "Ветер",
-        "zh": "风",
+        "zh-cn": "风",
+        "zh-tw": "風",
         "ja": "風",
         "ko": "바람",
         "nl": "Wind",
@@ -842,7 +908,8 @@ function uvRadiationText(languageCode) {
         "it": "UV",
         "pt": "UV",
         "ru": "УФ-излучение",
-        "zh": "紫外线辐射",
+        "zh-cn": "紫外线辐射",
+        "zh-tw": "紫外線輻射",
         "ja": "UV",
         "ko": "자외선 방사",
         "nl": "UV",

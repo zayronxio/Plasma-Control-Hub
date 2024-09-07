@@ -28,7 +28,8 @@ Item {
             "it": "Ciao",        // Italian
             "pt": "Olá",         // Portuguese
             "ru": "Привет",      // Russian
-            "zh": "你好",        // Chinese (Mandarin)
+            "zh-cn": "你好",        // Simplified Chinese (Mainland China)
+            "zh-tw": "你好",        // Traditional Chinese (Taiwan)
             "ja": "こんにちは", // Japanese
             "ko": "안녕하세요",  // Korean
             "nl": "Hallo",       // Dutch
