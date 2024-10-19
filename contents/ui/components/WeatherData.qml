@@ -138,14 +138,15 @@ Item {
   function getWeatherApi() {
     GetInfoApi.obtenerDatosClimaticos(latitude, longitud, day, currentTime, function(result) {
       datosweather = result;
-      checkDataReady(); // Verifica si los datos están listos después de obtener los datos del clima
+      console.log(result)
+      retry.start(); // Verifica si los datos están listos después de obtener los datos del clima
     });
   }
 
   function getForecastWeather() {
     GetModelWeather.GetForecastWeather(latitude, longitud, day, therday, function(result) {
       forecastWeather = result;
-      checkDataReady(); // Verifica si los datos están listos después de obtener el pronóstico
+      retry.start()
     });
   }
 
@@ -198,10 +199,8 @@ Item {
   }
 
   function updateWeather(x) {
-    getWeatherApi();
+
     if (x === 2) {
-      getCityFuncion();
-      getForecastWeather();
       if (useCoordinatesIp === "true") {
         getCoordinatesWithIp();
       } else {
@@ -209,13 +208,39 @@ Item {
           getCoordinatesWithIp();
         }
       }
+      getCityFuncion();
+      getForecastWeather();
     }
+    getWeatherApi();
+  }
+
+  onDatosweatherChanged: {
+    checkDataReady()
   }
 
   function checkDataReady() {
     // Verificar si forecastWeather y datosweather están disponibles
-    if (forecastWeather !== "0" && datosweather !== "0") {
+    if (forecastWeather !== "0" && datosweather !== "0" && datosweather !== "failed 0") {
       dataChanged(); // Emitir el signal dataChanged cuando los datos estén listos
+    }
+  }
+  Timer {
+    id: retry
+    interval: 5000
+    running: false
+    repeat: false
+    onTriggered: {
+      console.log("inicio")
+      if (datosweather === "failed 0") {
+        if (latitudeC === "0" || longitudC === "0") {
+          getCoordinatesWithIp();
+        }
+        getWeatherApi();
+        getForecastWeather();
+      }
+      if (city === "") {
+        getCityFuncion();
+      }
     }
   }
 

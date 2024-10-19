@@ -2,6 +2,7 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts
 import org.kde.plasma.plasmoid
+import QtCore
 import org.kde.plasma.core  as PlasmaCore
 import org.kde.plasma.components 3.0 as PlasmaComponents3
 import org.kde.kirigami as Kirigami
@@ -9,7 +10,6 @@ import org.kde.ksvg as KSvg
 import Qt5Compat.GraphicalEffects
 import org.kde.plasma.private.mpris as Mpris
 import org.kde.plasma.private.volume
-import org.kde.plasma.plasma5support 2.0 as P5Support
 import "js/funcs.js" as Funcs
 import "js/uiTranslator.js" as UiTranslator
 import "lib" as Lib
@@ -19,16 +19,33 @@ import org.kde.plasma.networkmanagement as PlasmaNM
 import "components" as Components
 import org.kde.plasma.private.brightnesscontrolplugin
 import org.kde.notificationmanager as NotificationManager
+import org.kde.plasma.private.sessions as Sessions
 
 PlasmoidItem {
     id: root
 
     property string codelang: ((Qt.locale().name)[0]+(Qt.locale().name)[1])
 
+
     // BLUETOOTH
     property QtObject btManager : BluezQt.Manager
 
     property var network: network
+
+    property color iconsSettingsColor: {
+        var themeColor = Kirigami.Theme.textColor;
+        var r = themeColor.r * 255;
+        var g = themeColor.g * 255;
+        var b = themeColor.b * 255;
+
+        var luminosity = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+
+        if (luminosity < 128) {
+            return "white"; // Use white if the color is dark
+        } else {
+            return "black"
+        }
+    }
 
     property var monitor: monitor
     property var inhibitor: inhibitor
@@ -46,6 +63,19 @@ PlasmoidItem {
 
 	UserInfo {
         id: userInfo
+    }
+
+    //SvgColorMonochrome {
+      //  id: svgColor
+    //}
+    Sessions.SessionManagement {
+        id: sm
+    }
+
+    Settings {
+        id: plasmaHubNightLightControl
+        category: "NightLightControl"
+        // property var files: []
     }
 
     // Audio source
@@ -66,19 +96,11 @@ PlasmoidItem {
     readonly property int brightnessMax: sbControl.brightnessMax
     readonly property int brightnessMin: (brightnessMax > 100 ? 1 : 0)
 
+     property bool nightLight: plasmaHubNightLightControl.value("toggleInhibition") !== undefined ? typeof plasmaHubNightLightControl.value("toggleInhibition") !== "boolean" ? plasmaHubNightLightControl.value("toggleInhibition") === "true" ? true : (false) : plasmaHubNightLightControl.value("toggleInhibition") : false
+
     property int screenBrightness: sbControl.brightness
     property bool disableBrightnessUpdate: true
 
-    P5Support.DataSource {
-        id: pmEngine
-        engine: "powermanagement"
-        connectedSources: ["PowerDevil", "Sleep States"]
-        function performOperation(what) {
-            var service = serviceForSource("PowerDevil")
-            var operation = service.operationDescription(what)
-            service.startOperationCall(operation)
-        }
-    }
 
     compactRepresentation: MouseArea {
         id: compactRoot
@@ -108,10 +130,11 @@ PlasmoidItem {
                 height: root.height
                 color: "transparent"
                 Kirigami.Icon {
-                    width: parent.width
-                    height: parent.height
+                    width: 22
+                    height: 22
                     source: "configure"
                     color: Kirigami.Theme.TextColor
+                    anchors.centerIn: parent
                 }
             }
         }
@@ -128,6 +151,13 @@ PlasmoidItem {
         }
         Components.Network {
             id: network
+        }
+
+        Component.onCompleted: {
+            console.log(nightLight, "pruebas de asignacio de luz nocturna", control.running )
+            if (!control.running && !nightLight) {
+                control.toggleInhibition()
+            }
         }
 
         Column {
@@ -190,7 +220,7 @@ PlasmoidItem {
                             width: parent.width
                             anchors.centerIn: parent
                             onClicked: {
-                                pmEngine.performOperation("requestShutDown")
+                                sm.requestLogoutPrompt()
                             }
                         }
                     }
@@ -233,8 +263,9 @@ PlasmoidItem {
                                         height: width
                                         radius: height/2
                                         Kirigami.Icon {
+                                            //isMask: true
                                             implicitWidth: parent.width*.8
-                                            color: Kirigami.Theme.TextColor
+                                            color: iconsSettingsColor
                                             anchors.centerIn: parent
                                             source: network.activeConnectionIcon
                                         }
@@ -279,7 +310,8 @@ PlasmoidItem {
                                         Kirigami.Icon {
                                             id: bluetoothIcon
                                             implicitWidth: parent.width*.8
-                                            color: Kirigami.Theme.TextColor
+                                            color: iconsSettingsColor
+
                                             anchors.centerIn: parent
                                             source: Funcs.getBtDevice() === "Disabled" ? Funcs.getBtDevice() === "Unavailable" ? "bluetooth-disabled-symbolic" : "bluetooth-active-symbolic" : "bluetooth-active-symbolic"
                                         }
@@ -315,6 +347,7 @@ PlasmoidItem {
                                     }
                                 }
                             }
+
                             Item {
                                 id: settings
                                 width: parent.width
@@ -334,7 +367,7 @@ PlasmoidItem {
                                         Kirigami.Icon {
                                             id: settingsIcon
                                             implicitWidth: parent.width*.8
-                                            color: Kirigami.Theme.TextColor
+                                            color: iconsSettingsColor
                                             anchors.centerIn: parent
                                             source: "configure"
                                         }
@@ -692,10 +725,14 @@ PlasmoidItem {
 
                                             anchors.verticalCenter: parent.verticalCenter
                                             anchors.horizontalCenter: parent.horizontalCenter
-                                            source: control.running ? "redshift-status-on" : "redshift-status-off"
+                                            source: nightLight ? "redshift-status-on" : "redshift-status-off"
                                                 MouseArea {
                                                     anchors.fill: parent
-                                                    onClicked: control.toggleInhibition()
+                                                    onClicked: {
+                                                        control.toggleInhibition()
+                                                        plasmaHubNightLightControl.setValue("toggleInhibition", !nightLight)
+                                                        nightLight = plasmaHubNightLightControl.value("toggleInhibition") !== undefined ? typeof plasmaHubNightLightControl.value("toggleInhibition") !== "boolean" ? plasmaHubNightLightControl.value("toggleInhibition") === "true" ? true : (false) : plasmaHubNightLightControl.value("toggleInhibition") : false
+                                                    }
                                                 }
                                         }
                                     }
@@ -706,7 +743,7 @@ PlasmoidItem {
                                          Label {
                                              id: textOfNightLight
                                              width: parent.width
-                                             text: control.running ? "On" : "Off"
+                                             text: nightLight ? "On" : "Off"
                                             font.pixelSize: labelredfish.height*.35
                                             horizontalAlignment: Text.AlignHCenter
     }
@@ -721,7 +758,8 @@ PlasmoidItem {
 
                                 readonly property bool transitioning: control.currentTemperature != control.targetTemperature
                                 readonly property bool hasSwitchingTimes: control.mode != 3
-                                readonly property bool togglable: !control.inhibited || control.inhibitedFromApplet
+                                readonly property bool togglable: nightLight || !control.inhibited || control.inhibitedFromApplet
+
                             }
                         }
                         Item {
