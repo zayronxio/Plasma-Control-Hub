@@ -52,3 +52,4 @@
 4. Click on "Download New Plasma Widgets"
 5. Search for "Plasma Control Hub"
 6. Click on "Install" and you're done!
+
