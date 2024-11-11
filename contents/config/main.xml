@@ -17,6 +17,9 @@
 	</entry>
     <entry name="userAndAvaAveilable" type="bool">
       <default>false</default>
-      </entry>
+    </entry>
+    <entry name="weatheCardActive" type="bool">
+        <default>true</default>
+    </entry>
   </group>
 </kcfg>

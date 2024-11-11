@@ -9,6 +9,7 @@ Item {
     property string nameLogo: ""
     property string city: weatherData.city
     property bool resetFullRep: true
+    property string value: weatherData.currentTemperature
 
     Components.WeatherData {
         id: weatherData
@@ -86,8 +87,8 @@ Item {
         }
         Image {
             id: rainProbabilityLogo
-            width: 24
-            height: 24
+            width: 16
+            height: 16
             source: "../icons/rain-probability.svg"
             sourceSize: Qt.size(width, width)
             fillMode: Image.PreserveAspectFit
@@ -98,8 +99,8 @@ Item {
         MultiEffect {
             id: rainProbabilityLogoColorized
             source: rainProbabilityLogo
-            width: 22
-            height: 22
+            width: 16
+            height: 16
             colorizationColor: Kirigami.Theme.textColor
             colorization: 1.0
             anchors.top: currentTemp.bottom
@@ -108,8 +109,8 @@ Item {
         }
 
         Text {
-            text: " 35%"
-            height: 24
+            text: " " + weatherData.probabilidadDeLLuvia + "%"
+            height: 20
             anchors.top: currentTemp.bottom
             anchors.topMargin: 15
             anchors.left: rainProbabilityLogoColorized.right

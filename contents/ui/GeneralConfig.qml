@@ -13,7 +13,7 @@ Item {
     property alias cfg_latitudeC: latitude.text
     property alias cfg_longitudeC: longitude.text
     property alias cfg_useCoordinatesIp: autamateCoorde.checked
-
+    property alias cfg_weatheCardActive: weatherCard.checked
     property alias cfg_userAndAvaAveilable: usrCheck.checked
 
     ColumnLayout {
@@ -67,6 +67,17 @@ ColumnLayout {
        columns: 2
        Label {
            width: configRoot.width/2
+           text: "Active Weather Card"
+       }
+       CheckBox {
+           id: weatherCard
+
+       }
+   }
+   GridLayout {
+       columns: 2
+       Label {
+           width: configRoot.width/2
            text: "Avatar And Name User"
     }
     CheckBox {
@@ -74,6 +85,7 @@ ColumnLayout {
 
     }
 }
+
 
 }
 
