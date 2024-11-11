@@ -2,12 +2,13 @@ import QtQuick
 import QtQuick.Controls
 import org.kde.kirigami as Kirigami
 import "components" as Components
+import QtQuick.Effects
 
 Item {
 
-    property color logoColor: "white"
     property string nameLogo: ""
-    property string city: ""
+    property string city: weatherData.city
+    property bool resetFullRep: true
 
     Components.WeatherData {
         id: weatherData
@@ -18,7 +19,7 @@ Item {
         width: parent.width
         height: parent.height
         //spacing: 5
-        visible: true
+        visible: resetFullRep
         Kirigami.Icon {
             id: logo
             source: weatherData.iconWeatherCurrent
@@ -29,36 +30,108 @@ Item {
         }
 
         Item {
+            id: maxAndMin
+            width: maxCurrent.width
+            height: logo.height
+            visible: weatherData.currentTemperature !== "failed"
+            anchors.verticalCenter: logo.verticalCenter
+            anchors.left: logo.right
+            opacity: 0.8
+            Column {
+                width: parent.width
+                height: (maxCurrent.implicitHeight * 2) + 1.5
+                anchors.verticalCenter: parent.verticalCenter
+                Text {
+                    id: maxCurrent
+                    text: Math.round(weatherData.maxweatherCurrent) + "°"
+                    font.pixelSize: logo.height*.3
+                    color: Kirigami.Theme.textColor
+                    verticalAlignment: Text.AlignTop
+                }
+                Rectangle {
+                    width: parent.width *.9
+                    color: Kirigami.Theme.textColor
+                    height: 1.5
+                }
+                Text {
+                    text: Math.round(weatherData.minweatherCurrent) + "°"
+                    font.pixelSize: logo.height*.3
+                    color: Kirigami.Theme.textColor
+                    verticalAlignment: Text.AlignBottom
+                }
+
+            }
+        }
+
+        Item {
             id: currentTemp
             width: textTempCurrent.implicitWidth
-            height: textTempCurrent.implicitHeight
+            height: textTempCurrent.implicitHeight + probability.implicitHeight
             anchors.left: parent.left
-            anchors.leftMargin: logo.width + 5
-            anchors.verticalCenter: parent.verticalCenter
+            anchors.leftMargin: maxAndMin.visible ? maxAndMin.width + logo.width + 5 : logo.width + 5
+            anchors.top: parent.top
+            anchors.topMargin: (parent.height - height - 24) /2
+
             Text {
                 id: textTempCurrent
                 width: parent.width
+                height: parent.height - probability.implicitHeight
                 text: weatherData.currentTemperature === "failed" ? "?" : weatherData.currentTemperature + "°"
-                font.pixelSize: wrapperWeatherMinimal.height*.5
+                font.pixelSize: wrapperWeatherMinimal.height*.3
                 color: Kirigami.Theme.textColor
                 font.bold: true
                 verticalAlignment: Text.AlignVCenter
             }
+
+        }
+        Image {
+            id: rainProbabilityLogo
+            width: 24
+            height: 24
+            source: "../icons/rain-probability.svg"
+            sourceSize: Qt.size(width, width)
+            fillMode: Image.PreserveAspectFit
+            visible: false
+        }
+
+
+        MultiEffect {
+            id: rainProbabilityLogoColorized
+            source: rainProbabilityLogo
+            width: 22
+            height: 22
+            colorizationColor: Kirigami.Theme.textColor
+            colorization: 1.0
+            anchors.top: currentTemp.bottom
+            anchors.topMargin: 15
+            anchors.left: currentTemp.left
+        }
+
+        Text {
+            text: " 35%"
+            height: 24
+            anchors.top: currentTemp.bottom
+            anchors.topMargin: 15
+            anchors.left: rainProbabilityLogoColorized.right
+            //anchors.leftMargin: 26
+            font.pixelSize: lo.height*.8
+            verticalAlignment: Text.AlignVCenter
+            color: Kirigami.Theme.textColor
         }
         Item {
             width: parent.width - logo.width - currentTemp.width - 20
-            height: (weatherData.city !== "unk") ? textWeather.implicitHeight + textCity.implicitHeight + 3 : textWeather.implicitHeight
+            height: (city !== "unk") ? textWeather.implicitHeight + textCity.implicitHeight + 4 : textWeather.implicitHeight
             anchors.verticalCenter: parent.verticalCenter
             anchors.right: parent.right
             anchors.rightMargin: 10
-            Row {
+            Column {
                 width: parent.width
                 height: parent.height
-                spacing: 3
+                spacing: 4
                 Text {
                     id: textWeather
                     width: parent.width
-                    height: (weatherData.city !== "unk") ? parent.height - textCity.implicitHeight :  parent.height
+                    height: (city !== "unk") ? parent.height - textCity.implicitHeight :  parent.height
                     text: weatherData.weatherShottext
                     wrapMode: Text.WordWrap
                     elide: Text.ElideRight
@@ -69,13 +142,13 @@ Item {
                 }
                 Text {
                     id: textCity
-                    height: parent.height -  textWeather.height
+                    height: parent.height - textWeather.height
                     width: parent.width
-                    text:  weatherData.city
+                    text: city
                     wrapMode: Text.WordWrap
                     elide: Text.ElideRight
                     font.pixelSize: wrapperWeatherMinimal.height*.15
-                    visible: (weatherData.city !== "unk")
+                    visible: city !== "unk"
                     color: Kirigami.Theme.textColor
                     verticalAlignment: Text.AlignVCenter
                     horizontalAlignment: Text.AlignRight
@@ -88,7 +161,8 @@ Item {
             width: parent.width
             anchors.centerIn: parent
             onClicked: {
-                wrapperWeatherMinimal.visible = !wrapperWeatherMinimal.visible
+                //wrapperWeatherMinimal.visible = !wrapperWeatherMinimal.visible
+                resetFullRep = !resetFullRep
             }
         }
     }
@@ -151,26 +225,29 @@ Item {
         }
     }
 
+    onResetFullRepChanged: {
+        wrapperWeatherMinimal.visible = resetFullRep
+    }
     Component.onCompleted: {
         weatherData.dataChanged.connect(updateForecastModel); // Conectar el signal dataChanged a la función updateForecastModel
     }
 
     ListView {
         width: parent.width
-        height: parent.height
+        height: parent.width
         model: forecastModel
         orientation: Qt.Horizontal
         layoutDirection : Qt.LeftToRight
         visible: !wrapperWeatherMinimal.visible
 
         delegate: Item {
-            height: listView.height
+            height: parent.height
             width: max.implicitWidth*2
 
             Column {
                 id: column
                 width: max.implicitWidth
-                height: listView.height
+                height: parent.height
                 Text {
                     width: parent.width
                     //height: parent.height/4
@@ -210,12 +287,13 @@ Item {
             }
 
         }
+        anchors.horizontalCenter: parent.horizontalCenter
         MouseArea {
             height: parent.height
             width: parent.width
             anchors.centerIn: parent
             onClicked: {
-                wrapperWeatherMinimal.visible = !wrapperWeatherMinimal.visible
+                resetFullRep = !resetFullRep
             }
         }
     }
