@@ -28,7 +28,7 @@
 ## Preview
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/zayronxio/Plasma-Control-Hub/main/img/preview.jpg" width=380/>
+  <img src="https://raw.githubusercontent.com/zayronxio/Plasma-Control-Hub/refs/heads/main/img/preview.jpg" width=380/>
 </p>
 
 
