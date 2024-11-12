@@ -29,10 +29,8 @@
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/zayronxio/Plasma-Control-Hub/main/img/preview.jpg" width=380/>
-  </p>
-  <p align="center">
-  <img src="https://raw.githubusercontent.com/zayronxio/Plasma-Control-Hub/main/img/tres.jpg" width=380/>
-  </p>
+</p>
+
 
 ## Install
 
