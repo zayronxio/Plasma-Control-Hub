@@ -100,11 +100,11 @@ Item {
     }
 
     property int heightCard: 85
-    property int marginSeperator: 5
+    property int marginSeperator: 10
 
 
     Layout.preferredWidth: 360
-    Layout.preferredHeight: wrapper.implicitHeight
+    Layout.preferredHeight: wrapper.implicitHeight + marginSeperator
     Layout.minimumWidth: 360
     Layout.maximumWidth: 360
     Layout.minimumHeight: Layout.preferredHeight
@@ -127,17 +127,19 @@ Item {
     Column {
         id: wrapper
         anchors.verticalCenter: parent.verticalCenter
-        width: menu.width
-        height: menu.height
+        width: menu.width - marginSeperator *2
+        height: menu.height - marginSeperator*2
+        anchors.left: parent.left
+        anchors.leftMargin: marginSeperator
+        anchors.top: parent.top
+        anchors.topMargin: marginSeperator
         Item {
             id: username
             width: parent.width
             height: (heightCard *.5) + marginSeperator
             visible: infoUserAvailable
-            KSvg.FrameSvgItem {
+            Lib.Card {
                 id: backgroundNameInfo // seccion de botones de red, bluetooth y config
-                imagePath: "opaque/dialogs/background"
-                clip: true
                 anchors.right: parent.right
                 anchors.left: parent.left
                 width: parent.width - 5
@@ -194,15 +196,16 @@ Item {
             id: utilities // Primera mitad el widget
             width: parent.width
             height: heightCard * 2 + marginSeperator*2
-            spacing: 5
+            spacing: marginSeperator
+
             Column {
                 width: parent.width/2
                 height: heightCard * 2 + marginSeperator
 
-                KSvg.FrameSvgItem {
+
+                Lib.Card {
                     id: backgrounNetBlueSettings // seccion de botones de red, bluetooth y config
-                    imagePath: "opaque/dialogs/background"
-                    clip: true
+
                     anchors.right: parent.right
                     anchors.left: parent.left
                     width: parent.width - 5
@@ -374,7 +377,7 @@ Item {
 
             }
             Column {
-                width:  parent.width/2
+                width:  parent.width/2 - marginSeperator
                 height: heightCard * 2 + marginSeperator*2
 
                 Column {
@@ -382,10 +385,7 @@ Item {
                     width: parent.width -5
                     height: heightCard + marginSeperator
 
-                    KSvg.FrameSvgItem {
-
-                        imagePath: "opaque/dialogs/background"
-                        clip: true
+                    Lib.Card {
                         anchors.right: parent.right
                         anchors.left: parent.left
                         width: parent.width
@@ -416,18 +416,16 @@ Item {
 
                 }
                 Row {
-                    width: parent.width -5
+                    width: parent.width - marginSeperator
                     height: heightCard + marginSeperator
-                    spacing: 5
+                    spacing: marginSeperator
                     visible: minimalweatherAndToggles.visible
                     Item {
                         id: itemredshitbutton
                         width: weatherToggle.visible ? (parent.width/2) - 2.5 : parent.width
                         height: parent.height
                         visible: true
-                        KSvg.FrameSvgItem {
-                            imagePath: "opaque/dialogs/background"
-                            clip: true
+                        Lib.Card {
                             anchors.right: parent.right
                             anchors.left: parent.left
                             width: parent.width
@@ -487,9 +485,9 @@ Item {
                         width: itemredshitbutton.visible ? (parent.width/2) -2.5 : (parent.width) -2.5
                         height: heightCard
                         visible: minimalweatherAndToggles.visible
-                        KSvg.FrameSvgItem {
-                            imagePath: "opaque/dialogs/background"
-                            clip: true
+                        Lib.Card {
+                            //magePath: "opaque/dialogs/background"
+                            //clip: true
                             anchors.right: parent.right
                             anchors.left: parent.left
                             width: parent.width
@@ -562,13 +560,11 @@ Item {
             width: parent.width
             height: heightCard + marginSeperator //brillo.visible ? (infoUserAvailable ? wrapper.height*.9 : wrapper.height)*.2 : (infoUserAvailable ? wrapper.height*.9 : wrapper.height)*.25
             visible: weatherInfo.value !== "failed" && Plasmoid.configuration.weatheCardActive
-            KSvg.FrameSvgItem {
-                imagePath: "opaque/dialogs/background"
-                clip: true
+            Lib.Card {
                 anchors.right: parent.right
                 anchors.left: parent.left
                 width: parent.width
-                height: parent.height - 5
+                height: parent.height - marginSeperator
 
                 WeatherInfo {
                     id: weatherInfo
@@ -584,12 +580,12 @@ Item {
             id: mutimedia
             width: parent.width
             height: heightCard + marginSeperator // brillo.visible ? (infoUserAvailable ? wrapper.height*.9 : wrapper.height)*.2 : (infoUserAvailable ? wrapper.height*.9 : wrapper.height)*.25
-
-            KSvg.FrameSvgItem {
+            //visible: false
+            Lib.Card {
                 id: rect
 
-                imagePath: "opaque/dialogs/background"
-                clip: true
+                //imagePath: "opaque/dialogs/background"
+                //clip: true
                 anchors.right: parent.right
                 anchors.left: parent.left
                 width: parent.width
