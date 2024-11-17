@@ -26,9 +26,7 @@ function getTranslateInJs(language, word) {
         sk: ["sieť", "bluetooth", "offline", "nastavenia", "nastavenia systému", "vypnuté", "nerušiť", "hlasitosť", "predpoveď počasia"],
         sl: ["omrežje", "bluetooth", "offline", "nastavitve", "sistemske nastavitve", "izklopljeno", "ne moti", "glasnost", "vremenska napoved"],
         sq: ["rrjet", "bluetooth", "offline", "cilësimet", "cilësimet e sistemit", "fikur", "mos shqetësoni", "vëllimi", "parashikimi i motit"],
-        sv: ["nätverk", "bluetooth", "offline", "inställningar", "systeminställningar", "av", "stör ej", "volym", "väderprognos"],
-        zh-cn: ["连接", "蓝牙", "尚未连接", "设置", "系统设置", "关闭", "请勿打扰", "音量", "天气预报"],
-        zh-tw: ["連接", "藍芽", "尚未連線", "設定", "系統設定", "關閉", "請勿打擾", "音量", "天氣預報"]
+        sv: ["nätverk", "bluetooth", "offline", "inställningar", "systeminställningar", "av", "stör ej", "volym", "väderprognos"]
     };
 
     const index = translatesUi['en'].indexOf(word.toLowerCase());

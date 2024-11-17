@@ -36,6 +36,8 @@ Item {
 
   property string datosweather: "0"
   property string forecastWeather: "0"
+  property string observer: datosweather + forecastWeather
+  property int retrysCity: 0
 
   property string oneIcon: asingicon(obtener(forecastWeather, 1))
   property string twoIcon: asingicon(obtener(forecastWeather, 2))
@@ -62,7 +64,7 @@ Item {
   property string day: (Qt.formatDateTime(new Date(), "yyyy-MM-dd"))
   property string therday: Qt.formatDateTime(new Date(new Date().getTime() + (numberOfDays * 24 * 60 * 60 * 1000)), "yyyy-MM-dd")
   property int numberOfDays: 6
-  property string temperaturaActual: fahrenheit(obtener(datosweather, 1))
+  property string currentTemperature: datosweather !== "0" ? fahrenheit(obtener(datosweather, 1)) : "?"
   property string codeleng: ((Qt.locale().name)[0] + (Qt.locale().name)[1])
   property string codeweather: obtener(datosweather, 4)
   property string codeweatherTomorrow: obtener(forecastWeather, 2)
@@ -86,16 +88,18 @@ Item {
   property string probabilidadDeLLuvia: obtener(datosweather, 5)
   property string textProbability: Traduc.rainProbabilityText(codeleng)
 
-  property string completeCoordinates: ""
+  property string completeCoordinates: "0"
+  property string oldCompleteCoordinates: "1"
   property string latitudeIP: completeCoordinates.substring(0, (completeCoordinates.indexOf(' ')) - 1)
   property string longitudIP: completeCoordinates.substring(completeCoordinates.indexOf(' ') + 1)
 
   property string uvtext: Traduc.uvRadiationText(codeleng)
   property string windSpeedText: Traduc.windSpeedText(codeleng)
-  property string city: ""
+  property string city: "unk"
 
   Component.onCompleted: {
-    updateWeather(2);
+    console.log("primer paso")
+    updateWeather(1);
   }
 
   function uvIndexLevelAssignment(nivel) {
@@ -119,34 +123,51 @@ Item {
   }
 
   function getCoordinatesWithIp() {
+    console.log("tercer paso")
     GeoCoordinates.obtenerCoordenadas(function(result) {
-      completeCoordinates = result;
+
+        completeCoordinates = result;
+        retryCoordinate.start()
     });
   }
 
+  onObserverCoordenatesChanged: {
+    console.log("Coordenadas cambiaron, actualizando clima");
+    if (latitude && longitud && latitude !== "0" && longitud !== "0") {
+      updateWeather(2);
+      getCityFuncion();
+    } else {
+      console.warn("Coordenadas inválidas, reintentando...");
+      retryCoordinate.start();
+    }
+  }
+
   function getCityFuncion() {
+
     if (!latitude || !longitud || latitude === "0" || longitud === "0") {
         console.error("Coordenadas inválidas para la solicitud de ciudad");
         return;
     }
     GetCity.getNameCity(latitude, longitud, codeleng, function(result) {
+
         city = result;
-        console.log("Ciudad obtenida: " + city);
+        retrycity.start()
     });
 }
 
   function getWeatherApi() {
+    console.log("quinto paso")
     GetInfoApi.obtenerDatosClimaticos(latitude, longitud, day, currentTime, function(result) {
-      datosweather = result;
-      console.log(result)
-      retry.start(); // Verifica si los datos están listos después de obtener los datos del clima
+        datosweather = result;
+        getForecastWeather()
+        retry.start()
     });
   }
 
   function getForecastWeather() {
     GetModelWeather.GetForecastWeather(latitude, longitud, day, therday, function(result) {
       forecastWeather = result;
-      retry.start()
+      //retry.start()
     });
   }
 
@@ -199,29 +220,60 @@ Item {
   }
 
   function updateWeather(x) {
-
-    if (x === 2) {
+    if (x === 1) {
+      console.log("segundo paso")
       if (useCoordinatesIp === "true") {
         getCoordinatesWithIp();
       } else {
         if (latitudeC === "0" || longitudC === "0") {
           getCoordinatesWithIp();
+        } else {
+          getWeatherApi()
+          console.log("se esta ejecutando")
         }
       }
-      getCityFuncion();
-      getForecastWeather();
     }
-    getWeatherApi();
+///
+    if (x === 2) {
+      getWeatherApi();
+    }
   }
 
-  onDatosweatherChanged: {
+
+
+  onObserverChanged: {
     checkDataReady()
   }
 
   function checkDataReady() {
     // Verificar si forecastWeather y datosweather están disponibles
-    if (forecastWeather !== "0" && datosweather !== "0" && datosweather !== "failed 0") {
+    if (forecastWeather !== "0" && datosweather !== "0" ) {
       dataChanged(); // Emitir el signal dataChanged cuando los datos estén listos
+    }
+  }
+
+  Timer {
+    id: retryCoordinate
+    interval: 5000
+    running: false
+    repeat: false
+    onTriggered: {
+      if (completeCoordinates === "0") {
+        getCoordinatesWithIp();
+      }
+
+    }
+  }
+  Timer {
+    id: retrycity
+    interval: 6000
+    running: false
+    repeat: false
+    onTriggered: {
+      if (city === "unk" && retrysCity < 5) {
+        retrysCity = retrysCity + 1
+        getCityFuncion();
+      }
     }
   }
   Timer {
@@ -230,16 +282,8 @@ Item {
     running: false
     repeat: false
     onTriggered: {
-      console.log("inicio")
-      if (datosweather === "failed 0") {
-        if (latitudeC === "0" || longitudC === "0") {
-          getCoordinatesWithIp();
-        }
+      if (datosweather === "0") {
         getWeatherApi();
-        getForecastWeather();
-      }
-      if (city === "") {
-        getCityFuncion();
       }
     }
   }
@@ -250,7 +294,21 @@ Item {
     running: false
     repeat: true
     onTriggered: {
+      oldCompleteCoordinates = completeCoordinates
       updateWeather(1);
+      veri.start()
+    }
+  }
+
+  Timer {
+    id: veri
+    interval: 4000
+    running: false
+    repeat: false
+    onTriggered: {
+     if (oldCompleteCoordinates === completeCoordinates) {
+       updateWeather(2)
+    }
     }
   }
 
@@ -264,6 +322,6 @@ Item {
     }
   }
 
-  onObserverCoordenatesChanged: updateWeather(2)
+  onUseCoordinatesIpChanged: updateWeather(1)
 }
 

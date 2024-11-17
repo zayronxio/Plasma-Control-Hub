@@ -9,7 +9,7 @@ Item {
     property string nameLogo: ""
     property string city: weatherData.city
     property bool resetFullRep: true
-    property string value: weatherData.currentTemperature
+    property bool value: false
 
     Components.WeatherData {
         id: weatherData
@@ -34,7 +34,7 @@ Item {
             id: maxAndMin
             width: maxCurrent.width
             height: logo.height
-            visible: weatherData.currentTemperature !== "failed"
+            visible: value
             anchors.verticalCenter: logo.verticalCenter
             anchors.left: logo.right
             opacity: 0.8
@@ -77,7 +77,7 @@ Item {
                 id: textTempCurrent
                 width: parent.width
                 height: parent.height - probability.implicitHeight
-                text: weatherData.currentTemperature === "failed" ? "?" : weatherData.currentTemperature + "°"
+                text: weatherData.currentTemperature === "?" ? "?" : weatherData.currentTemperature + "°"
                 font.pixelSize: wrapperWeatherMinimal.height*.3
                 color: Kirigami.Theme.textColor
                 font.bold: true
@@ -224,6 +224,8 @@ Item {
 
 
         }
+        console.log("pruebas")
+        value = true
     }
 
     onResetFullRepChanged: {
@@ -232,6 +234,8 @@ Item {
     Component.onCompleted: {
         weatherData.dataChanged.connect(updateForecastModel); // Conectar el signal dataChanged a la función updateForecastModel
     }
+
+
 
     ListView {
         width: parent.width

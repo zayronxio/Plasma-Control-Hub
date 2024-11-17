@@ -26,8 +26,8 @@ function obtenerDatosClimaticos(latitud, longitud, fechaInicio, hours, callback)
                  console.log(`${full}`);
                  callback(full);
              } else {
-                 console.error(`Error en la solicitud: ${req.status}`);
-                 callback(`failed ${req.status}`)
+                 console.error(`Error en la solicitud: weathergeneral ${req.status}`);
+                 //callback(`failed ${req.status}`)
              }
          }
      };

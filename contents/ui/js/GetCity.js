@@ -21,7 +21,7 @@ function getNameCity(latitude, longitud, leng, callback) {
                     console.error("Error al analizar la respuesta JSON: ", e);
                 }
             } else {
-                console.error(`Error en la solicitud de city: ${req.status}, ${req.statusText}`);
+                console.error(`city failed`);
             }
         }
     };

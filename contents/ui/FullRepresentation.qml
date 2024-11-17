@@ -208,7 +208,7 @@ Item {
 
                     anchors.right: parent.right
                     anchors.left: parent.left
-                    width: parent.width - 5
+                    width: parent.width - marginSeperator
                     height: heightCard * 2 + marginSeperator
                     Column {
                         width: parent.width
@@ -367,6 +367,7 @@ Item {
                                         id: subNameSettigns
                                         width: parent.width*.9
                                         text: UiTranslator.getTranslateInJs(codelang, "System Settings")
+                                        elide: Text.ElideRight
                                         font.pixelSize: nameSettigns.font.pixelSize*.8
                                     }
                                 }
@@ -382,7 +383,7 @@ Item {
 
                 Column {
                     id: minimalweatherAndToggles
-                    width: parent.width -5
+                    width: parent.width
                     height: heightCard + marginSeperator
 
                     Lib.Card {
@@ -416,7 +417,7 @@ Item {
 
                 }
                 Row {
-                    width: parent.width - marginSeperator
+                    width: parent.width - marginSeperator/2
                     height: heightCard + marginSeperator
                     spacing: marginSeperator
                     visible: minimalweatherAndToggles.visible
@@ -559,7 +560,7 @@ Item {
             id: weatherCard
             width: parent.width
             height: heightCard + marginSeperator //brillo.visible ? (infoUserAvailable ? wrapper.height*.9 : wrapper.height)*.2 : (infoUserAvailable ? wrapper.height*.9 : wrapper.height)*.25
-            visible: weatherInfo.value !== "failed" && Plasmoid.configuration.weatheCardActive
+            visible: weatherInfo.value && Plasmoid.configuration.weatheCardActive
             Lib.Card {
                 anchors.right: parent.right
                 anchors.left: parent.left

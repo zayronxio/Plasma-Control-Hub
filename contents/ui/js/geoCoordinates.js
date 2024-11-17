@@ -15,6 +15,7 @@ function obtenerCoordenadas(callback) {
                 callback(full);
             } else {
                 console.error(`Error en la solicitud: ${req.status}`);
+                //callback("failed");
             }
         }
     };
