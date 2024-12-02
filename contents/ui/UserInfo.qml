@@ -18,30 +18,8 @@ Item {
         return string.charAt(0).toUpperCase() + string.slice(1);
     }
 
-    function hiText(languageCode) {
-        const translations = {
-            "es": "Hola",        // Spanish
-            "en": "Hello",       // English
-            "hi": "नमस्ते",      // Hindi
-            "fr": "Salut",       // French
-            "de": "Hallo",       // German
-            "it": "Ciao",        // Italian
-            "pt": "Olá",         // Portuguese
-            "ru": "Привет",      // Russian
-            "zh-cn": "你好",        // Simplified Chinese (Mainland China)
-            "zh-tw": "你好",        // Traditional Chinese (Taiwan)
-            "ja": "こんにちは", // Japanese
-            "ko": "안녕하세요",  // Korean
-            "nl": "Hallo",       // Dutch
-            "ny": "Moni",        // Chichewa
-            "mk": "Здраво"       // Macedonian
-        };
 
-        // Return the translation for the language code or default to English if not found
-        return translations[languageCode] || translations["en"];
-    }
-
-    property string name: hiText(codeleng) + " " + capitalizeFirstLetter(kuser.fullName)
+    property string name: i18n("Hi") + " " + capitalizeFirstLetter(kuser.fullName)
     property string urlAvatar: kuser.faceIconUrl
 
 

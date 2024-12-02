@@ -36,7 +36,7 @@ Item {
 
   property string datosweather: "0"
   property string forecastWeather: "0"
-  property string observer: datosweather + forecastWeather
+  //property string observer: datosweather + forecastWeather
   property int retrysCity: 0
 
   property string oneIcon: asingicon(obtener(forecastWeather, 1))
@@ -53,7 +53,7 @@ Item {
   property int fiveMax: fahrenheit(obtener(forecastWeather, 12))
   property int sixMax: fahrenheit(obtener(forecastWeather, 13))
   property int sevenMax: fahrenheit(obtener(forecastWeather, 14))
-  property int oneMin: fahrenheit(obtener(forecastWeather, 14))
+  property int oneMin: fahrenheit(obtener(forecastWeather, 15))
   property int twoMin: fahrenheit(obtener(forecastWeather, 16))
   property int threeMin: fahrenheit(obtener(forecastWeather, 17))
   property int fourMin: fahrenheit(obtener(forecastWeather, 18))
@@ -82,8 +82,8 @@ Item {
   property string uvindex: uvIndexLevelAssignment(obtener(datosweather, 7))
   property string windSpeed: obtener(datosweather, 6)
 
-  property string weatherLongtext: Traduc.weatherLongText(codeleng, codeweather)
-  property string weatherShottext: Traduc.weatherShortText(codeleng, codeweather)
+  property string weatherLongtext: i18n(textWeather(codeweather))
+  property string weatherShottext: i18n(shortTextWeather(codeweather))
 
   property string probabilidadDeLLuvia: obtener(datosweather, 5)
   property string textProbability: Traduc.rainProbabilityText(codeleng)
@@ -95,7 +95,9 @@ Item {
 
   property string uvtext: Traduc.uvRadiationText(codeleng)
   property string windSpeedText: Traduc.windSpeedText(codeleng)
+  property int isDay: obtener(datosweather, 8)
   property string city: "unk"
+  property string prefixIcon: isDay === 1 ? "" : "-night"
 
   Component.onCompleted: {
     console.log("primer paso")
@@ -123,7 +125,6 @@ Item {
   }
 
   function getCoordinatesWithIp() {
-    console.log("tercer paso")
     GeoCoordinates.obtenerCoordenadas(function(result) {
 
         completeCoordinates = result;
@@ -156,7 +157,6 @@ Item {
 }
 
   function getWeatherApi() {
-    console.log("quinto paso")
     GetInfoApi.obtenerDatosClimaticos(latitude, longitud, day, currentTime, function(result) {
         datosweather = result;
         getForecastWeather()
@@ -170,6 +170,8 @@ Item {
       //retry.start()
     });
   }
+
+
 
   function asingicon(x, b) {
     let wmocodes = {
@@ -200,28 +202,76 @@ Item {
       96: "storm",
       99: "storm",
     };
-    var cicloOfDay = isday();
     var iconName = "weather-" + (wmocodes[x] || "unknown");
-    var iconNamePresicion = cicloOfDay === "day" ? iconName : iconName + "-" + cicloOfDay;
+    var iconNamePresicion = iconName + prefixIcon
     return b === "preciso" ? iconNamePresicion : iconName;
   }
 
-  function isday() {
-    var timeActual = Number(Qt.formatDateTime(new Date(), "h"));
-    if (timeActual < 6) {
-      if (timeActual > 19) {
-        return "night";
-      } else {
-        return "day";
-      }
-    } else {
-      return "day";
-    }
+  function textWeather(x) {
+    let text = {
+      0: "Clear",
+      1: "Mainly clear",
+      2: "Partly cloudy",
+      3: "Overcast",
+      51: "Drizzle light intensity",
+      53: "Drizzle moderate intensity",
+      55: "Drizzle dense intensity",
+      56: "Freezing Drizzle light intensity",
+      57: "Freezing Drizzle dense intensity",
+      61: "Rain slight intensity",
+      63: "Rain moderate intensity",
+      65: "Rain heavy intensity",
+      66: "Freezing Rain light intensity",
+      67: "Freezing Rain heavy intensity",
+      71: "Snowfall slight intensity",
+      73: "Snowfall moderate intensity",
+      75: "Snowfall heavy intensity",
+      77: "Snow grains",
+      80: "Rain showers slight",
+      81: "Rain showers moderate",
+      82: "Rain showers violent",
+      85: "Snow showers slight",
+      86: "Snow showers heavy",
+      95: "Thunderstorm",
+      96: "Thunderstorm with slight hail"
+    };
+    return text[x]
+  }
+
+  function shortTextWeather(x) {
+    let text = {
+      0: "Clear",
+      1: "Clear",
+      2: "Cloudy",
+      3: "Cloudy",
+      51: "Drizzle",
+      53: "Drizzle",
+      55: "Drizzle",
+      56: "Drizzle",
+      57: "Drizzle",
+      61: "Rain",
+      63: "Rain",
+      65: "Rain",
+      66: "Rain",
+      67: "Rain",
+      71: "Snow",
+      73: "Snow",
+      75: "Snow",
+      77: "Hail",
+      80: "Showers",
+      81: "Showers",
+      82: "Showers",
+      85: "Showers",
+      86: "Showers",
+      95: "Storm",
+      96: "Storm",
+      99: "Storm"
+    };
+    return text[x]
   }
 
   function updateWeather(x) {
     if (x === 1) {
-      console.log("segundo paso")
       if (useCoordinatesIp === "true") {
         getCoordinatesWithIp();
       } else {
@@ -229,7 +279,6 @@ Item {
           getCoordinatesWithIp();
         } else {
           getWeatherApi()
-          console.log("se esta ejecutando")
         }
       }
     }
@@ -241,13 +290,8 @@ Item {
 
 
 
-  onObserverChanged: {
-    checkDataReady()
-  }
-
-  function checkDataReady() {
-    // Verificar si forecastWeather y datosweather están disponibles
-    if (forecastWeather !== "0" && datosweather !== "0" ) {
+  onForecastWeatherChanged: {
+    if (forecastWeather.length > 3) {
       dataChanged(); // Emitir el signal dataChanged cuando los datos estén listos
     }
   }
@@ -312,15 +356,6 @@ Item {
     }
   }
 
-  Timer {
-    id: forecastTimer
-    interval: 3.6e+6
-    running: true
-    repeat: true
-    onTriggered: {
-      getForecastWeather();
-    }
-  }
 
   onUseCoordinatesIpChanged: updateWeather(1)
 }

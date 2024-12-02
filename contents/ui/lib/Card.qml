@@ -1,8 +1,10 @@
+/*
+ *    SPDX-FileCopyrightText: zayronxio
+ *    SPDX-License-Identifier: GPL-3.0-or-later
+ */
 import QtQuick 2.15
 import org.kde.plasma.plasmoid 2.0
 import org.kde.ksvg as KSvg
-import QtQuick.Effects
-import Qt5Compat.GraphicalEffects
 
 Item {
     id: root
@@ -108,6 +110,7 @@ Item {
             imagePath: "dialogs/background"
             elementId: "shadow-bottomright"
         }
+
     }
 
 
@@ -171,39 +174,6 @@ Item {
             elementId: "bottomright"
         }
     }
-
-
-    ///MultiEffect {
-        //width: root.width
-        //height: root.height
-        //visible: true
-       // source: bs
-        //anchors.fill: maskSvg
-        //shadowEnabled: true
-        //opacity: 0.5
-        //paddingRect: Qt.rect(20,20,40,30)
-        //maskEnabled: true
-        //maskSource: bs
-        //layer.enabled: true
-        //layer.effect: OpacityMask {
-          //  maskSource:  bs
-            //invert: true
-       // }
-
-   // }
-
-
-    //KSvg.FrameSvgItem {
-      //  id: segment
-        //imagePath: "dialogs/background"
-        //clip: false
-        //visible: false
-        //width: root.width
-        //height: root.height
-        //enabledBorders: TopBorder | BottomBorder | LeftBorder | RightBorder
-        //opacity: 0.7
-
-    //}
 
 
 }

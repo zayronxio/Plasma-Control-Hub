@@ -25,7 +25,7 @@ Item {
     //height: wrapper.implicitHeight //410 //brillo.visible ? Plasmoid.configuration.weatheCardActive ? 410 : 380 : Plasmoid.configuration.weatheCardActive ? 380 : 350
     //implicitWidth: 335
 
-     property string codelang: ((Qt.locale().name)[0]+(Qt.locale().name)[1])
+    property string codelang: ((Qt.locale().name)[0]+(Qt.locale().name)[1])
     property QtObject btManager : BluezQt.Manager
 
     property var network: network
@@ -133,17 +133,18 @@ Item {
         anchors.leftMargin: marginSeperator
         anchors.top: parent.top
         anchors.topMargin: marginSeperator
-        Item {
+        Row {
             id: username
             width: parent.width
-            height: (heightCard *.5) + marginSeperator
-            visible: infoUserAvailable
+            height: 32 + marginSeperator
+            spacing: 10
+            visible: true //infoUserAvailable
             Lib.Card {
                 id: backgroundNameInfo // seccion de botones de red, bluetooth y config
-                anchors.right: parent.right
+                //anchors.right: parent.right
                 anchors.left: parent.left
-                width: parent.width - 5
-                height: heightCard *.5
+                width: parent.width - 10 - batteryAndShutdown.width
+                height: 32
                 Rectangle {
                     id: maskavatar
                     height: parent.height*.75
@@ -174,13 +175,48 @@ Item {
                     text: userInfo.name
                 }
 
+
+            }
+            Lib.Card {
+                id: batteryAndShutdown
+                width: battery.hasBattery ? parent.width *.3 : parent.width *0.12
+                height: 32
+                anchors.right: parent.right
+                Battery {
+                    id: battery
+                    height: parent.height
+                    visible: hasBattery
+                    //width: implicitWidth
+                }
+
+                Row {
+                    width: 2
+                    height: parent.height
+                    anchors.left: battery.right
+                    anchors.leftMargin: 5
+                    visible: battery.hasBattery
+                    Rectangle {
+                        color: "white"
+                        width: 1
+                        height: parent.height
+                        opacity: 0.2
+                    }
+                    Rectangle {
+                        color: "black"
+                        width: 1
+                        height: parent.height
+                        opacity: 0.2
+                    }
+                }
+
                 Kirigami.Icon {
                     source: "system-shutdown.svg"
-                    width: parent.height*.8
+                    width: 24
                     height: width
-                    anchors.right: parent.right
+                    anchors.left: parent.left
                     anchors.verticalCenter: parent.verticalCenter
-                    anchors.rightMargin: parent.height/3
+                    anchors.leftMargin: battery.hasBattery ? battery.width +  (parent.width - battery.width + 2)/2 - width/2 : (
+                    parent.width - width)/2
                     MouseArea {
                         height: parent.height
                         width: parent.width
@@ -190,6 +226,7 @@ Item {
                         }
                     }
                 }
+
             }
         }
         Row {
@@ -252,7 +289,7 @@ Item {
                                     id: nameNetwork
                                     anchors.verticalCenter: parent.verticalCenter
                                     width: parent.width*.9
-                                    text: UiTranslator.getTranslateInJs(codelang, "Network")
+                                    text: i18n("Network")
                                     font.pixelSize: networkItem.height*.22
                                     font.bold: true
                                 }
@@ -301,7 +338,7 @@ Item {
                                     PlasmaComponents3.Label {
                                         id: nameBluetooth
                                         width: parent.width*.9
-                                        text: UiTranslator.getTranslateInJs(codelang, "Bluetooth")
+                                        text: i18n("Bluetooth")
                                         font.pixelSize: bluetooth.height*.22
                                         font.bold: true
                                     }
@@ -398,7 +435,7 @@ Item {
                             anchors.left: parent.left
                             anchors.leftMargin: (parent.width - ((parent.width - 37) *.9) - 32)/2
                             PlasmaComponents3.Label {
-                                text: UiTranslator.getTranslateInJs(codelang, "Volume")
+                                text: i18n("Volume")
                                 font.bold: true
                                 anchors.verticalCenter: parent.verticalCenter
                             }

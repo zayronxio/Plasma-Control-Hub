@@ -5,7 +5,7 @@ import "components" as Components
 import QtQuick.Effects
 
 Item {
-
+    id: weatherItem
     property string nameLogo: ""
     property string city: weatherData.city
     property bool resetFullRep: true
@@ -224,15 +224,18 @@ Item {
 
 
         }
-        console.log("pruebas")
-        value = true
+
     }
 
     onResetFullRepChanged: {
         wrapperWeatherMinimal.visible = resetFullRep
     }
     Component.onCompleted: {
-        weatherData.dataChanged.connect(updateForecastModel); // Conectar el signal dataChanged a la función updateForecastModel
+        weatherData.dataChanged.connect(() => {
+            Qt.callLater(updateForecastModel); // Asegura que la función se ejecute al final del ciclo de eventos
+            value = true
+        });
+
     }
 
 
@@ -247,7 +250,7 @@ Item {
 
         delegate: Item {
             height: parent.height
-            width: max.implicitWidth*2
+            width: weatherItem.width/7
 
             Column {
                 id: column
@@ -259,6 +262,7 @@ Item {
                     text: model.date
                     horizontalAlignment: Text.AlignHCenter
                     color: Kirigami.Theme.textColor
+                    verticalAlignment:  Text.AlignVCenter
                     //anchors.horizontalCenter: parent.horizontalCenter
 
                 }
@@ -279,6 +283,7 @@ Item {
                     text: model.maxTemp + "°"
                     color: Kirigami.Theme.textColor
                     horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
                 }
                 Text {
                     id: min
@@ -287,6 +292,7 @@ Item {
                     text: model.minTemp + "°"
                     color: Kirigami.Theme.textColor
                     horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
                     opacity: 0.8
                 }
             }
@@ -302,6 +308,4 @@ Item {
             }
         }
     }
-
-
 }
