@@ -14,6 +14,8 @@
 
 ## Features
 
+- Battery indicator
+- Shutdown button
 - Multimedia Controls
 - Volume control
 - toogle control bluetooth

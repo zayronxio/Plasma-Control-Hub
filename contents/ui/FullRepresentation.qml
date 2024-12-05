@@ -136,15 +136,15 @@ Item {
         Row {
             id: username
             width: parent.width
-            height: 32 + marginSeperator
+            height: 36 + marginSeperator
             spacing: 10
-            visible: true //infoUserAvailable
+            visible: infoUserAvailable
             Lib.Card {
                 id: backgroundNameInfo // seccion de botones de red, bluetooth y config
                 //anchors.right: parent.right
                 anchors.left: parent.left
                 width: parent.width - 10 - batteryAndShutdown.width
-                height: 32
+                height: 36
                 Rectangle {
                     id: maskavatar
                     height: parent.height*.75
@@ -179,12 +179,14 @@ Item {
             }
             Lib.Card {
                 id: batteryAndShutdown
-                width: battery.hasBattery ? parent.width *.3 : parent.width *0.12
-                height: 32
+                width: battery.hasBattery ? (battery.width + 12) < ((parent.width *0.10) + 12 ) ? parent.width *0.20 + 17 : battery.width + 10 + parent.width *0.10 : parent.width *0.10
+                height: 36
                 anchors.right: parent.right
                 Battery {
                     id: battery
                     height: parent.height
+                    anchors.left: parent.left
+                    anchors.leftMargin: 5
                     visible: hasBattery
                     //width: implicitWidth
                 }
@@ -199,13 +201,13 @@ Item {
                         color: "white"
                         width: 1
                         height: parent.height
-                        opacity: 0.2
+                        opacity: 0.1
                     }
                     Rectangle {
                         color: "black"
                         width: 1
                         height: parent.height
-                        opacity: 0.2
+                        opacity: 0.1
                     }
                 }
 
@@ -215,7 +217,7 @@ Item {
                     height: width
                     anchors.left: parent.left
                     anchors.verticalCenter: parent.verticalCenter
-                    anchors.leftMargin: battery.hasBattery ? battery.width +  (parent.width - battery.width + 2)/2 - width/2 : (
+                    anchors.leftMargin: battery.hasBattery ? battery.width +  (parent.width - battery.width + 7)/2 - width/2 : (
                     parent.width - width)/2
                     MouseArea {
                         height: parent.height
@@ -315,7 +317,7 @@ Item {
                                         id: bluetoothIcon
                                         implicitWidth: parent.width*.8
                                         color: iconsSettingsColor
-
+                                        //isMask: true
                                         anchors.centerIn: parent
                                         source: Funcs.getBtDevice() === "Disabled" ? Funcs.getBtDevice() === "Unavailable" ? "bluetooth-disabled-symbolic" : "bluetooth-active-symbolic" : "bluetooth-active-symbolic"
                                     }

@@ -22,6 +22,8 @@ Item {
     }
   }
 
+  property bool active: Plasmoid.configuration.weatheCardActive
+  property bool isInExecution:  false
   property string useCoordinatesIp: plasmoid.configuration.useCoordinatesIp
   property string latitudeC: plasmoid.configuration.latitudeC
   property string longitudeC: plasmoid.configuration.longitudeC
@@ -88,7 +90,7 @@ Item {
   property string probabilidadDeLLuvia: obtener(datosweather, 5)
   property string textProbability: Traduc.rainProbabilityText(codeleng)
 
-  property string completeCoordinates: "0"
+  property string completeCoordinates: ""
   property string oldCompleteCoordinates: "1"
   property string latitudeIP: completeCoordinates.substring(0, (completeCoordinates.indexOf(' ')) - 1)
   property string longitudIP: completeCoordinates.substring(completeCoordinates.indexOf(' ') + 1)
@@ -100,7 +102,6 @@ Item {
   property string prefixIcon: isDay === 1 ? "" : "-night"
 
   Component.onCompleted: {
-    console.log("primer paso")
     updateWeather(1);
   }
 
@@ -302,7 +303,7 @@ Item {
     running: false
     repeat: false
     onTriggered: {
-      if (completeCoordinates === "0") {
+      if (completeCoordinates === "") {
         getCoordinatesWithIp();
       }
 
@@ -357,6 +358,12 @@ Item {
   }
 
 
-  onUseCoordinatesIpChanged: updateWeather(1)
+  onUseCoordinatesIpChanged: {
+    if (active) {
+      console.log(active, "esto no deberia ejectutarse")
+      updateWeather(1);
+      isInExecution = true
+    }
+  }
 }
 
