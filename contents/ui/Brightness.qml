@@ -1,18 +1,20 @@
 import org.kde.plasma.private.brightnesscontrolplugin
 import QtQuick
 import QtQuick.Controls
+import org.kde.kirigami as Kirigami
 import org.kde.kitemmodels as KItemModels
 
 Item {
 
+    property bool active: systemBrightnessControl.isBrightnessAvailable
 
     ScreenBrightnessControl {
-        id: sbControl
+        id: systemBrightnessControl
         isSilent: false
     }
     Connections {
         id: displayModelConnections
-        target: sbControl.displays
+        target: systemBrightnessControl.displays
         property var screenBrightnessInfo: []
 
         function update() {
@@ -23,9 +25,9 @@ Item {
                 const modelIndex = target.index(i, 0);
                 return {
                     displayName: target.data(modelIndex, displayNameRole),
-                    label: target.data(modelIndex, labelRole),
-                    brightness: target.data(modelIndex, brightnessRole),
-                    maxBrightness: target.data(modelIndex, maxBrightnessRole),
+                                                                            label: target.data(modelIndex, labelRole),
+                                                                            brightness: target.data(modelIndex, brightnessRole),
+                                                                            maxBrightness: target.data(modelIndex, maxBrightnessRole),
                 };
             });
             brightnessControl.mainScreen = screenBrightnessInfo[0];
@@ -37,30 +39,38 @@ Item {
         function onRowsRemoved() { update(); }
     }
 
-    // Other properties
     property var mainScreen: displayModelConnections.screenBrightnessInfo[0]
     property bool disableBrightnessUpdate: true
-
     readonly property int brightnessMin: (mainScreen.maxBrightness > 100 ? 1 : 0)
 
-    Slider {
-        id: sli
-        width: parent.width * 0.8
-        height: 24
+    Kirigami.Heading {
+        id: name
+        text: i18n("Brightness")
+        font.weight: Font.DemiBold
+        level: 5
+        anchors.left: slider.left
+        anchors.top: parent.top
+        anchors.topMargin: Kirigami.Units.gridUnit /2
+    }
 
+    Slider {
+        id: slider
+        width: parent.width - Kirigami.Units.gridUnit
+        height: 24
+        //anchors.verticalCenter: parent.verticalCenter
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.top: parent.top
+        anchors.topMargin: ((parent.height - height)/2) + name.implicitHeight/2
         from: 0
         to: mainScreen.maxBrightness
         value: mainScreen.brightness
         snapMode: Slider.SnapAlways
         onMoved: {
-            sbControl.setBrightness(mainScreen.displayName, Math.max(brightnessMin, Math.min(mainScreen.maxBrightness, value))) ;
+            systemBrightnessControl.setBrightness(mainScreen.displayName, Math.max(brightnessMin, Math.min(mainScreen.maxBrightness, value))) ;
         }
     }
 
-    Text {
-        text: sbControl.isBrightnessAvailable
-    }
     Connections {
-        target: sbControl
+        target: systemBrightnessControl
     }
 }
