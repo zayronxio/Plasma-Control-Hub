@@ -23,7 +23,11 @@ msgstr "你好"
 
 #: ../contents/ui/FullRepresentation.qml
 msgid "Settings"
-msgstr "设置"
+msgstr "設定"
+
+#: ../contents/ui/FullRepresentation.qml
+msgid "System Settings"
+msgstr "系统设置"
 
 #: ../contents/ui/FullRepresentation.qml
 msgid "Volume"
@@ -31,7 +35,7 @@ msgstr "音量"
 
 #: ../contents/ui/FullRepresentation.qm
 msgid "Bluetooth"
-msgstr "蓝牙"
+msgstr "藍芽"
 
 #: ../contents/ui/FullRepresentation.qm
 msgid "Network"
@@ -39,7 +43,7 @@ msgstr "网络"
 
 #: ../contents/ui/FullRepresentation.qm
 msgid "DND"
-msgstr "勿扰"
+msgstr "請勿打擾"
 
 #: ../contents/ui/js/funcs.js
 msgid "Disabled"
@@ -57,13 +61,17 @@ msgstr "离线"
 msgid "Not Connected"
 msgstr "未连接"
 
+#: ../contents/ui/Brightness.qml
+msgid "Brightness"
+msgstr "亮度"
+
 #: ../contents/ui/component/WeatherData.qml
 msgid "Clear"
-msgstr "晴朗"
+msgstr "晴"
 
 #: ../contents/ui/component/WeatherData.qml
 msgid "Mainly clear"
-msgstr "大致晴朗"
+msgstr "晴间多云"
 
 #: ../contents/ui/component/WeatherData.qml
 msgid "Partly cloudy"

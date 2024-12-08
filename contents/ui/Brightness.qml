@@ -25,9 +25,9 @@ Item {
                 const modelIndex = target.index(i, 0);
                 return {
                     displayName: target.data(modelIndex, displayNameRole),
-                                                                            label: target.data(modelIndex, labelRole),
-                                                                            brightness: target.data(modelIndex, brightnessRole),
-                                                                            maxBrightness: target.data(modelIndex, maxBrightnessRole),
+                    label: target.data(modelIndex, labelRole),
+                    brightness: target.data(modelIndex, brightnessRole),
+                    maxBrightness: target.data(modelIndex, maxBrightnessRole),
                 };
             });
             brightnessControl.mainScreen = screenBrightnessInfo[0];

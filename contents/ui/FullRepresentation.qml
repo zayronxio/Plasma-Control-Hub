@@ -2,23 +2,19 @@ import QtQuick
 import QtQuick.Controls
 import QtCore
 import QtQuick.Layouts
-//import org.kde.plasma.core  as PlasmaCore
+import Qt5Compat.GraphicalEffects
 import org.kde.plasma.components 3.0 as PlasmaComponents3
 import org.kde.kirigami as Kirigami
-import org.kde.ksvg as KSvg
-import Qt5Compat.GraphicalEffects
+import org.kde.plasma.private.brightnesscontrolplugin
 import org.kde.plasma.private.mpris as Mpris
 import "js/funcs.js" as Funcs
-import "js/uiTranslator.js" as UiTranslator
 import "lib" as Lib
 import "components" as Components
 import org.kde.plasma.plasmoid
 import org.kde.bluezqt 1.0 as BluezQt
 import org.kde.kcmutils // KCMLauncher
 import org.kde.plasma.networkmanagement as PlasmaNM
-import org.kde.plasma.private.brightnesscontrolplugin
-import org.kde.notificationmanager as NotificationManager
-import org.kde.plasma.private.sessions as Sessions
+
 
 Item {
     id: menu
@@ -48,12 +44,7 @@ Item {
     property var monitor: monitor
     property var inhibitor: inhibitor
 
-    // NOTIFICATION MANAGER
-    property var notificationSettings: notificationSettings
 
-    NotificationManager.Settings {
-        id: notificationSettings
-    }
     UserInfo {
         id: userInfo
     }
@@ -61,9 +52,6 @@ Item {
     //SvgColorMonochrome {
     //  id: svgColor
     //}
-    Sessions.SessionManagement {
-        id: sm
-    }
 
     Settings {
         id: plasmaHubNightLightControl
@@ -83,8 +71,6 @@ Item {
 
     property bool nightLight: plasmaHubNightLightControl.value("toggleInhibition") !== undefined ? typeof plasmaHubNightLightControl.value("toggleInhibition") !== "boolean" ? plasmaHubNightLightControl.value("toggleInhibition") === "true" ? true : (false) : plasmaHubNightLightControl.value("toggleInhibition") : false
 
-    property int screenBrightness: sbControl.brightness
-    property bool disableBrightnessUpdate: true
 
     // Lists all available network connections
     Components.SectionNetworks{
@@ -398,14 +384,14 @@ Item {
                                     PlasmaComponents3.Label {
                                         id: nameSettigns
                                         width: parent.width*.9
-                                        text: UiTranslator.getTranslateInJs(codelang, "Settings")
+                                        text: i18n("Settings")
                                         font.pixelSize: bluetooth.height*.22
                                         font.bold: true
                                     }
                                     PlasmaComponents3.Label {
                                         id: subNameSettigns
                                         width: parent.width*.9
-                                        text: UiTranslator.getTranslateInJs(codelang, "System Settings")
+                                        text: i18n("System Settings")
                                         elide: Text.ElideRight
                                         font.pixelSize: nameSettigns.font.pixelSize*.8
                                     }
@@ -583,14 +569,18 @@ Item {
             id: brillo
             width: parent.width
             height: heightCard
-            visible: false // en espera de actualizacion
-            KSvg.FrameSvgItem {
-                imagePath: "opaque/dialogs/background"
-                clip: true
+            visible: brightness.active
+            Lib.Card {
                 anchors.right: parent.right
                 anchors.left: parent.left
                 width: parent.width
-                height: parent.height - 5
+                height: parent.height - marginSeperator
+
+                Brightness {
+                    id: brightness
+                    width: parent.width
+                    height: parent.height
+                }
 
             }
         }
