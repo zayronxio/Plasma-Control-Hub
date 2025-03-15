@@ -6,10 +6,11 @@ import Qt5Compat.GraphicalEffects
 import org.kde.plasma.components 3.0 as PlasmaComponents3
 import org.kde.kirigami as Kirigami
 import org.kde.plasma.private.brightnesscontrolplugin
-import org.kde.plasma.private.mpris as Mpris
 import "js/funcs.js" as Funcs
 import "lib" as Lib
+import org.kde.plasma.private.sessions as Sessions
 import "components" as Components
+import org.kde.notificationmanager as NotificationManager
 import org.kde.plasma.plasmoid
 import org.kde.bluezqt 1.0 as BluezQt
 import org.kde.kcmutils // KCMLauncher
@@ -18,23 +19,16 @@ import org.kde.plasma.networkmanagement as PlasmaNM
 
 Item {
     id: menu
-    //height: wrapper.implicitHeight //410 //brillo.visible ? Plasmoid.configuration.weatheCardActive ? 410 : 380 : Plasmoid.configuration.weatheCardActive ? 380 : 350
-    //implicitWidth: 335
 
-    property string codelang: ((Qt.locale().name)[0]+(Qt.locale().name)[1])
     property QtObject btManager : BluezQt.Manager
 
     property var network: network
 
-    property color iconsSettingsColor: {
-        var themeColor = Kirigami.Theme.highlightColor;
-        var r = themeColor.r * 255;
-        var g = themeColor.g * 255;
-        var b = themeColor.b * 255;
+    property color iconsSettingsColor:  {
+        var color = Kirigami.Theme.highlightColor;
+        const luminance = 0.299 * color.r + 0.587 * color.g + 0.114 * color.b;
 
-        var luminosity = 0.2126 * r + 0.7152 * g + 0.0722 * b;
-
-        if (luminosity < 160) {
+        if (luminance < 0.6) {
             return "white"; // Use white if the color is dark
         } else {
             return "black"
@@ -49,9 +43,24 @@ Item {
         id: userInfo
     }
 
+    SourceMultimedia {
+        id: multimedia
+    }
+
+    // NOTIFICATION MANAGER
+    property var notificationSettings: notificationSettings
+
+    NotificationManager.Settings {
+        id: notificationSettings
+    }
+
     //SvgColorMonochrome {
     //  id: svgColor
     //}
+
+    Sessions.SessionManagement {
+        id: sm
+    }
 
     Settings {
         id: plasmaHubNightLightControl
@@ -85,23 +94,18 @@ Item {
         weatherInfo.resetFullRep = true
     }
 
-    property int heightCard: 85
+    property int heightCard: Kirigami.Units.gridUnit * 4
     property int marginSeperator: 10
 
 
-    Layout.preferredWidth: 360
+    Layout.preferredWidth: Kirigami.Units.gridUnit * 18
     Layout.preferredHeight: wrapper.implicitHeight + marginSeperator
-    Layout.minimumWidth: 360
-    Layout.maximumWidth: 360
+    Layout.minimumWidth: Kirigami.Units.gridUnit * 18
+    Layout.maximumWidth: Kirigami.Units.gridUnit * 18
     Layout.minimumHeight: Layout.preferredHeight
     Layout.maximumHeight: Layout.preferredHeight
     clip: true
     // Lists all available network connections
-
-
-    Mpris.Mpris2Model {
-        id: mpris2Model
-    }
 
     Component.onCompleted: {
         console.log(nightLight, "pruebas de asignacio de luz nocturna", control.running )
@@ -122,7 +126,7 @@ Item {
         Row {
             id: username
             width: parent.width
-            height: 36 + marginSeperator
+            height: (Kirigami.Units.gridUnit * 1.5) + marginSeperator
             spacing: 10
             visible: infoUserAvailable
             Lib.Card {
@@ -130,7 +134,7 @@ Item {
                 //anchors.right: parent.right
                 anchors.left: parent.left
                 width: parent.width - 10 - batteryAndShutdown.width
-                height: 36
+                height: Kirigami.Units.gridUnit * 1.5
                 Rectangle {
                     id: maskavatar
                     height: parent.height*.75
@@ -152,13 +156,14 @@ Item {
                     }
                 }
 
-                PlasmaComponents3.Label {
+                Kirigami.Heading {
                     height: parent.height
                     anchors.left: parent.left
                     anchors.leftMargin: avatar.height*2
                     verticalAlignment: Text.AlignVCenter
-                    font.bold: true
+                    font.weight: Font.DemiBold
                     text: userInfo.name
+                    level: 5
                 }
 
 
@@ -166,7 +171,7 @@ Item {
             Lib.Card {
                 id: batteryAndShutdown
                 width: battery.hasBattery ? (battery.width + 12) < ((parent.width *0.10) + 12 ) ? parent.width *0.20 + 17 : battery.width + 10 + parent.width *0.10 : parent.width *0.10
-                height: 36
+                height: Kirigami.Units.gridUnit * 1.5
                 anchors.right: parent.right
                 Battery {
                     id: battery
@@ -273,13 +278,14 @@ Item {
                                 width: parent.width*.7
                                 height: parent.height
                                 anchors.right: parent.right
-                                PlasmaComponents3.Label {
+                                Kirigami.Heading {
                                     id: nameNetwork
                                     anchors.verticalCenter: parent.verticalCenter
                                     width: parent.width*.9
                                     text: i18n("Network")
-                                    font.pixelSize: networkItem.height*.22
-                                    font.bold: true
+                                    //font.pixelSize: networkItem.height*.22
+                                    font.weight: Font.DemiBold
+                                    level: 5
                                 }
 
                             }
@@ -301,11 +307,11 @@ Item {
                                     radius: height/2
                                     Kirigami.Icon {
                                         id: bluetoothIcon
-                                        implicitWidth: parent.width*.8
+                                        implicitWidth: parent.width*.8// Kirigami.Units.iconSizes.medium
                                         color: iconsSettingsColor
                                         //isMask: true
                                         anchors.centerIn: parent
-                                        source: Funcs.getBtDevice() === "Disabled" ? Funcs.getBtDevice() === "Unavailable" ? "bluetooth-disabled-symbolic" : "bluetooth-active-symbolic" : "bluetooth-active-symbolic"
+                                        source: Funcs.getBtDevice() === i18n("Disabled") || Funcs.getBtDevice() === i18n("Unavailable")  ? "network-bluetooth-inactive-symbolic" : Funcs.getBtDevice() === i18n("Not Connected") ? "network-bluetooth-symbolic" : Funcs.getBtDevice() === i18n("Offline") ? "network-bluetooth-inactive-symbolic" : "network-bluetooth-activated" //Funcs.getBtDevice() === "Unavailable" ? "network-bluetooth-inactive-symbolic" : "network-bluetooth-activated-symbolic" : "network-bluetooth"
                                     }
                                     MouseArea {
                                         anchors.fill: parent
@@ -323,12 +329,13 @@ Item {
                                     width: parent.width
                                     height: nameBluetooth.height+subNameBluetooth.height
                                     anchors.verticalCenter: parent.verticalCenter
-                                    PlasmaComponents3.Label {
+                                    Kirigami.Heading {
                                         id: nameBluetooth
                                         width: parent.width*.9
                                         text: i18n("Bluetooth")
-                                        font.pixelSize: bluetooth.height*.22
-                                        font.bold: true
+                                        //font.pixelSize: bluetooth.height*.22
+                                        font.weight: Font.DemiBold
+                                        level: 5
                                     }
                                     PlasmaComponents3.Label {
                                         id: subNameBluetooth
@@ -343,6 +350,7 @@ Item {
                         Item {
                             id: settings
                             width: parent.width
+
                             height: parent.height/3
                             Row {
                                 width: parent.width*.3
@@ -381,12 +389,13 @@ Item {
                                     height: nameSettigns.height+subNameSettigns.height
                                     anchors.verticalCenter: parent.verticalCenter
 
-                                    PlasmaComponents3.Label {
+                                    Kirigami.Heading {
                                         id: nameSettigns
                                         width: parent.width*.9
                                         text: i18n("Settings")
-                                        font.pixelSize: bluetooth.height*.22
-                                        font.bold: true
+                                        //font.pixelSize: bluetooth.height*.22
+                                        font.weight: Font.DemiBold
+                                        level: 5
                                     }
                                     PlasmaComponents3.Label {
                                         id: subNameSettigns
@@ -409,7 +418,7 @@ Item {
                 Column {
                     id: minimalweatherAndToggles
                     width: parent.width
-                    height: heightCard + marginSeperator
+                    height: (heightCard) + marginSeperator
 
                     Lib.Card {
                         anchors.right: parent.right
@@ -418,13 +427,18 @@ Item {
                         height: heightCard
 
                         Item {
+                            id: volumeText
                             width: parent.width
-                            height: parent.height/2
+                            height: vl.implicitHeight
                             anchors.left: parent.left
                             anchors.leftMargin: (parent.width - ((parent.width - 37) *.9) - 32)/2
-                            PlasmaComponents3.Label {
+                            anchors.top: parent.top
+                            anchors.topMargin: Kirigami.Units.gridUnit /2
+                            Kirigami.Heading  {
+                                id: vl
                                 text: i18n("Volume")
-                                font.bold: true
+                                font.weight: Font.DemiBold
+                                level: 5
                                 anchors.verticalCenter: parent.verticalCenter
                             }
                         }
@@ -433,8 +447,8 @@ Item {
                             id: volumeSlider
                             width: parent.width
                             height: 32
-                            anchors.bottom: parent.bottom
-                            anchors.bottomMargin: 20
+                            anchors.top: volumeText.bottom
+                            //anchors.topMargin: 5
 
                         }
 
@@ -484,11 +498,12 @@ Item {
                                     id: labelredfish
                                     width: parent.width
                                     height: parent.height*.4
-                                    Label {
+                                    Kirigami.Heading {
                                         id: textOfNightLight
                                         width: parent.width
                                         text: nightLight ? "On" : "Off"
-                                        font.pixelSize: labelredfish.height*.35
+                                        //font.pixelSize: labelredfish.height*.35
+                                        level: 5
                                         horizontalAlignment: Text.AlignHCenter
                                     }
                                 }
@@ -543,18 +558,19 @@ Item {
                                     width: parent.width
                                     height: parent.height*.4
 
-                                    PlasmaComponents3.Label {
+                                    Kirigami.Heading {
                                         id: textdontDis
                                         text: i18n("DND")
                                         width: parent.width
-                                        font.pixelSize: weatherToggle.height < weatherToggle.width ? weatherToggle.height*.15 : weatherToggle.width*.15
+                                        level: 5
+                                        //font.pixelSize: weatherToggle.height < weatherToggle.width ? weatherToggle.height*.15 : weatherToggle.width*.15
                                         wrapMode: Text.WordWrap
                                         elide: Text.ElideRight
                                         maximumLineCount: 2
                                         verticalAlignment: Text.AlignVCenter
                                         horizontalAlignment: Text.AlignHCenter
 
-                                        //font.bold: true
+                                        //font.weight: Font.DemiBold
                                     }
                                 }
                             }
@@ -568,7 +584,7 @@ Item {
         Item {
             id: brillo
             width: parent.width
-            height: heightCard
+            height: heightCard *.9
             visible: brightness.active
             Lib.Card {
                 anchors.right: parent.right
@@ -646,7 +662,7 @@ Item {
                         sourceSize: Qt.size(width, width)
                         fillMode: Image.PreserveAspectFit
                         anchors.verticalCenter: parent.verticalCenter
-                        visible: !mpris2Model.currentPlayer?.artUrl
+                        visible: !multimedia.cover
                         Kirigami.Icon {
                             source: "multimedia-audio-player"
                             width: parent.width *.6
@@ -658,8 +674,8 @@ Item {
                         anchors.verticalCenter: parent.verticalCenter
                         width: maskalbum.width
                         height: maskalbum.height
-                        source: mpris2Model.currentPlayer?.artUrl
-                        visible: !mpris2Model.currentPlayer?.artUrl ? false : true
+                        source: multimedia.cover
+                        visible: !multimedia.cover ? false : true
                         layer.enabled: true
                         layer.effect: OpacityMask {
                             maskSource: maskalbum
@@ -685,7 +701,7 @@ Item {
                                 width: (contenedorInfoMusic.width - controlsMultimedia.width)
                                 text: mpris2Model.currentPlayer?.track
                                 font.pixelSize: mutimedia.height*.15
-                                font.bold: true
+                                font.weight: Font.DemiBold
                                 wrapMode: Text.WordWrap
                                 elide: Text.ElideRight
                                 maximumLineCount: 2
@@ -708,10 +724,6 @@ Item {
                         height: 22
                         spacing: 2
                         anchors.verticalCenter: parent.verticalCenter
-                        function next() {
-                            mpris2Model.currentPlayer.Next();
-
-                        }
 
                         Kirigami.Icon {
                             id: iconplay
@@ -721,7 +733,7 @@ Item {
                             roundToIconSize: false
                             MouseArea {
                                 anchors.fill: parent
-                                onClicked: mpris2Model.currentPlayer.PlayPause();
+                                onClicked: multimedia.playPause()
                             }
                         }
                         Kirigami.Icon {
@@ -732,7 +744,7 @@ Item {
                             roundToIconSize: false
                             MouseArea {
                                 anchors.fill: parent
-                                onClicked:  mpris2Model.currentPlayer.Next();
+                                onClicked: multimedia.nextTrack()
                             }
                         }
 

@@ -47,7 +47,7 @@ Item {
         id: name
         text: i18n("Brightness")
         font.weight: Font.DemiBold
-        level: 5
+        level: 4
         anchors.left: slider.left
         anchors.top: parent.top
         anchors.topMargin: Kirigami.Units.gridUnit /2

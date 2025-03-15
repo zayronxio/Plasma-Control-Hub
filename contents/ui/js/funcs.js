@@ -143,3 +143,11 @@ function sumarDia(a) {
         console.log("Fecha con un día añadido:", fechaFormateada);
         return fechaFormateada
     }
+
+    function celsiusToFahrenheit(celsius,bool) {
+        if (bool) {
+            return celsius
+        } else {
+            return (celsius * 9/5) + 32;
+        }
+    }

@@ -2,12 +2,15 @@ import QtQuick
 import QtQuick.Controls
 import org.kde.kirigami as Kirigami
 import org.kde.kcmutils // KCMLauncher
+import org.kde.plasma.components 3.0 as PlasmaComponents
 import org.kde.plasma.private.volume
 
 Item {
 
     property var sink: PreferredDevice.sink
     readonly property bool sinkAvailable: sink && !(sink && sink.name == "auto_null")
+
+
 
     Slider {
         id: sli
@@ -21,6 +24,7 @@ Item {
         value: (sink.volume / PulseAudio.NormalVolume * 100)
         to: 100
         snapMode: Slider.SnapAlways
+        //stepSize: 5
         onMoved: {
             sink.volume = value * PulseAudio.NormalVolume / 100
         }

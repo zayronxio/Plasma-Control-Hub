@@ -54,15 +54,9 @@ Item {
         id: conteiner
         height: parent.height
         width: logo.width + text.implicitWidth
-        //spacing: 2
-        Kirigami.Icon {
-            id: logo
-            width: 24
-            height: 24
-            color: Kirigami.Theme.textColor
-            anchors.verticalCenter: parent.verticalCenter
-            source: determineIcon(percent)
-        }
+        spacing: 2
+        anchors.left: parent.left
+
         Controls.Label {
             id: text
             width: parent.width - logo.width - 2
@@ -70,6 +64,14 @@ Item {
             verticalAlignment: Text.AlignVCenter
             text: percent + "%"
             //font.pixelSize: Kirigami.Theme.defaultFont.pointSize
+        }
+        Kirigami.Icon {
+            id: logo
+            width: 24
+            height: 24
+            color: Kirigami.Theme.textColor
+            anchors.verticalCenter: parent.verticalCenter
+            source: determineIcon(percent)
         }
 
     }

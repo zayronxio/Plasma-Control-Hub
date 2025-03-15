@@ -2,7 +2,9 @@ import QtQuick
 import QtQuick.Controls
 import org.kde.kirigami as Kirigami
 import "components" as Components
+import org.kde.plasma.plasmoid
 import QtQuick.Effects
+import "js/funcs.js" as Funcs
 
 Item {
     id: weatherItem
@@ -10,6 +12,7 @@ Item {
     property string city: weatherData.city
     property bool resetFullRep: true
     property bool value: false
+
 
     Components.WeatherData {
         id: weatherData
@@ -44,7 +47,7 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
                 Text {
                     id: maxCurrent
-                    text: Math.round(weatherData.maxweatherCurrent) + "°"
+                    text: Math.round(Funcs.celsiusToFahrenheit(weatherData.maxweatherCurrent, Plasmoid.configuration.celsius)) + "°"
                     font.pixelSize: logo.height*.3
                     color: Kirigami.Theme.textColor
                     verticalAlignment: Text.AlignTop
@@ -55,7 +58,7 @@ Item {
                     height: 1.5
                 }
                 Text {
-                    text: Math.round(weatherData.minweatherCurrent) + "°"
+                    text: Math.round(Funcs.celsiusToFahrenheit(weatherData.minweatherCurrent, Plasmoid.configuration.celsius)) + "°"
                     font.pixelSize: logo.height*.3
                     color: Kirigami.Theme.textColor
                     verticalAlignment: Text.AlignBottom
@@ -77,7 +80,7 @@ Item {
                 id: textTempCurrent
                 width: parent.width
                 height: parent.height - probability.implicitHeight
-                text: weatherData.currentTemperature === "?" ? "?" : weatherData.currentTemperature + "°"
+                text: weatherData.currentTemperature === "?" ? "?" : Funcs.celsiusToFahrenheit(weatherData.currentTemperature, Plasmoid.configuration.celsius) + "°"
                 font.pixelSize: wrapperWeatherMinimal.height*.3
                 color: Kirigami.Theme.textColor
                 font.bold: true
@@ -280,7 +283,7 @@ Item {
                     id: max
                     width: parent.width
                     //height: parent.height/4
-                    text: model.maxTemp + "°"
+                    text: Funcs.celsiusToFahrenheit(model.maxTemp, Plasmoid.configuration.celsius) + "°"
                     color: Kirigami.Theme.textColor
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
@@ -289,7 +292,7 @@ Item {
                     id: min
                     width: parent.width
                     //height: parent.height/4
-                    text: model.minTemp + "°"
+                    text: Funcs.celsiusToFahrenheit(model.minTemp, Plasmoid.configuration.celsius) + "°"
                     color: Kirigami.Theme.textColor
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter

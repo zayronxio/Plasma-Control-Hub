@@ -42,7 +42,7 @@ PlasmoidItem {
                     width: 22
                     height: 22
                     source: "configure"
-                    color: Kirigami.Theme.TextColor
+                    //color: Kirigami.Theme.TextColor
                     anchors.centerIn: parent
                 }
             }
