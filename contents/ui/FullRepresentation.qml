@@ -747,15 +747,9 @@ Item {
                                 onClicked: multimedia.nextTrack()
                             }
                         }
-
                     }
-
-
                 }
             }
-
-
         }
-
     }
 }
