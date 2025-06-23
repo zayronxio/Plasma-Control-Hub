@@ -513,14 +513,6 @@ Item {
 
                             }
                         }
-                        NightLightControl {
-                            id: control
-
-                            readonly property bool transitioning: control.currentTemperature != control.targetTemperature
-                            readonly property bool hasSwitchingTimes: control.mode != 3
-                            readonly property bool togglable: nightLight || !control.inhibited || control.inhibitedFromApplet
-
-                        }
                     }
                     Item {
                         id: weatherToggle
