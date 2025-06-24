@@ -643,7 +643,7 @@ Item {
                             PlasmaComponents3.Label {
                                 id: title2
                                 width: (contenedorInfoMusic.width - controlsMultimedia.width)
-                                text: mpris2Model.currentPlayer?.track
+                                text: multimedia.trackName
                                 font.pixelSize: mutimedia.height*.15
                                 font.weight: Font.DemiBold
                                 wrapMode: Text.WordWrap
@@ -653,7 +653,7 @@ Item {
                             PlasmaComponents3.Label {
                                 width: (contenedorInfoMusic.width - controlsMultimedia.width)
                                 id: artist2
-                                text: mpris2Model.currentPlayer?.artist ?? ""
+                                text: multimedia.artistName
                                 font.pixelSize: mutimedia.height*.14
                                 elide: Text.ElideRight
                                 visible: artist2.text.length > 1 ? true : false
