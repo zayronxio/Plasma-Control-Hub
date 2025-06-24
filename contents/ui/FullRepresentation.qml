@@ -1,12 +1,10 @@
 import QtQuick
 import QtQuick.Controls
-import QtCore
 import QtQuick.Layouts
 import Qt5Compat.GraphicalEffects
 import org.kde.plasma.private.mpris as Mpris
 import org.kde.plasma.components 3.0 as PlasmaComponents3
 import org.kde.kirigami as Kirigami
-import org.kde.plasma.private.brightnesscontrolplugin
 import "js/funcs.js" as Funcs
 import "lib" as Lib
 import org.kde.plasma.private.sessions as Sessions
@@ -63,23 +61,12 @@ Item {
         id: sm
     }
 
-    Settings {
-        id: plasmaHubNightLightControl
-        category: "NightLightControl"
-        // property var files: []
-    }
 
     readonly property bool isVertical: Plasmoid.formFactor === PlasmaCore.Types.Vertical
 
     property string iconNotifications: "notifications"
 
     property bool infoUserAvailable: Plasmoid.configuration.userAndAvaAveilable
-
-    // brightnesscontrolplugin
-    readonly property int brightnessMax: sbControl.brightnessMax
-    readonly property int brightnessMin: (brightnessMax > 100 ? 1 : 0)
-
-    property bool nightLight: plasmaHubNightLightControl.value("toggleInhibition") !== undefined ? typeof plasmaHubNightLightControl.value("toggleInhibition") !== "boolean" ? plasmaHubNightLightControl.value("toggleInhibition") === "true" ? true : (false) : plasmaHubNightLightControl.value("toggleInhibition") : false
 
 
     // Lists all available network connections
@@ -109,7 +96,6 @@ Item {
     // Lists all available network connections
 
     Component.onCompleted: {
-        console.log(nightLight, "pruebas de asignacio de luz nocturna", control.running )
         if (!control.running && !nightLight) {
             control.toggleInhibition()
         }
@@ -131,8 +117,7 @@ Item {
             spacing: 10
             visible: infoUserAvailable
             Lib.Card {
-                id: backgroundNameInfo // seccion de botones de red, bluetooth y config
-                //anchors.right: parent.right
+                id: backgroundNameInfo // seccion de informacion del usuario
                 anchors.left: parent.left
                 width: parent.width - 10 - batteryAndShutdown.width
                 height: Kirigami.Units.gridUnit * 1.5
@@ -160,7 +145,7 @@ Item {
                 Kirigami.Heading {
                     height: parent.height
                     anchors.left: parent.left
-                    anchors.leftMargin: avatar.height*2
+                    anchors.leftMargin: userInfo.urlAvatar ? avatar.height*2 : avatar.height/2
                     verticalAlignment: Text.AlignVCenter
                     font.weight: Font.DemiBold
                     text: userInfo.name
@@ -472,56 +457,14 @@ Item {
                             width: parent.width
                             height: heightCard
 
-                            Column {
+                            NLightControl {
+                                id: nLightControl
                                 width: parent.width
                                 height: parent.height
-                                Item {
-                                    width: parent.width
-                                    height: parent.height*.6
-                                    Kirigami.Icon {
-                                        id: iconOfRedshift
-                                        implicitHeight: parent.height*.9
-
-                                        anchors.verticalCenter: parent.verticalCenter
-                                        anchors.horizontalCenter: parent.horizontalCenter
-                                        source: nightLight ? "redshift-status-on" : "redshift-status-off"
-                                        MouseArea {
-                                            anchors.fill: parent
-                                            onClicked: {
-                                                control.toggleInhibition()
-                                                plasmaHubNightLightControl.setValue("toggleInhibition", !nightLight)
-                                                nightLight = plasmaHubNightLightControl.value("toggleInhibition") !== undefined ? typeof plasmaHubNightLightControl.value("toggleInhibition") !== "boolean" ? plasmaHubNightLightControl.value("toggleInhibition") === "true" ? true : (false) : plasmaHubNightLightControl.value("toggleInhibition") : false
-                                            }
-                                        }
-                                    }
-                                }
-                                Item {
-                                    id: labelredfish
-                                    width: parent.width
-                                    height: parent.height*.4
-                                    Kirigami.Heading {
-                                        id: textOfNightLight
-                                        width: parent.width
-                                        text: nightLight ? "On" : "Off"
-                                        //font.pixelSize: labelredfish.height*.35
-                                        level: 5
-                                        horizontalAlignment: Text.AlignHCenter
-                                    }
-                                }
-
-
-
                             }
                         }
-                        NightLightControl {
-                            id: control
-
-                            readonly property bool transitioning: control.currentTemperature != control.targetTemperature
-                            readonly property bool hasSwitchingTimes: control.mode != 3
-                            readonly property bool togglable: nightLight || !control.inhibited || control.inhibitedFromApplet
-
-                        }
                     }
+
                     Item {
                         id: weatherToggle
                         width: itemredshitbutton.visible ? (parent.width/2) -2.5 : (parent.width) -2.5
@@ -623,11 +566,11 @@ Item {
             }
 
         }
+
         Item {
             id: mutimedia
             width: parent.width
-            height: heightCard + marginSeperator // brillo.visible ? (infoUserAvailable ? wrapper.height*.9 : wrapper.height)*.2 : (infoUserAvailable ? wrapper.height*.9 : wrapper.height)*.25
-            //visible: false
+            height: heightCard + marginSeperator
             Lib.Card {
                 id: rect
 
