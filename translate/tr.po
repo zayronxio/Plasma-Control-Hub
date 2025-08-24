@@ -68,7 +68,7 @@ msgstr "Parlaklık"
 
 #: ../contents/ui/component/WeatherData.qml
 msgid "Clear"
-msgstr "AÇık hava"
+msgstr "Açık hava"
 
 #: ../contents/ui/component/WeatherData.qml
 msgid "Mainly clear"
